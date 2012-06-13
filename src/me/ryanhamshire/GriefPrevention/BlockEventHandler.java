@@ -233,19 +233,19 @@ public class BlockEventHandler implements Listener
 			}
 		}
 		
-		//FEATURE: limit tree planting to grass, and dirt with more earth beneath it
-		if(block.getType() == Material.SAPLING)
-		{
-			Block earthBlock = placeEvent.getBlockAgainst();
-			if(earthBlock.getType() != Material.GRASS)
-			{
-				if(earthBlock.getRelative(BlockFace.DOWN).getType() == Material.AIR || 
-				   earthBlock.getRelative(BlockFace.DOWN).getRelative(BlockFace.DOWN).getType() == Material.AIR)
-				{
-					placeEvent.setCancelled(true);
-				}
-			}
-		}
+		// //FEATURE: limit tree planting to grass, and dirt with more earth beneath it
+		// if(block.getType() == Material.SAPLING)
+		// {
+		// 	Block earthBlock = placeEvent.getBlockAgainst();
+		// 	if(earthBlock.getType() != Material.GRASS)
+		// 	{
+		// 		if(earthBlock.getRelative(BlockFace.DOWN).getType() == Material.AIR || 
+		// 		   earthBlock.getRelative(BlockFace.DOWN).getRelative(BlockFace.DOWN).getType() == Material.AIR)
+		// 		{
+		// 			placeEvent.setCancelled(true);
+		// 		}
+		// 	}
+		// }
 		
 		//make sure the player is allowed to build at the location
 		String noBuildReason = GriefPrevention.instance.allowBuild(player, block.getLocation());
