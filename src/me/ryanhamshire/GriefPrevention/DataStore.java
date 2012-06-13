@@ -35,7 +35,7 @@ public class DataStore
 	private HashMap<String, PlayerData> playerNameToPlayerDataMap = new HashMap<String, PlayerData>();
 	
 	//in-memory cache for claim data
-	private ArrayList<Claim> claims = new ArrayList<Claim>();
+	public ArrayList<Claim> claims = new ArrayList<Claim>();
 	
 	//path information, for where stuff stored on disk is well...  stored
 	private final static String dataLayerFolderPath = "plugins" + File.separator + "GriefPreventionData";
