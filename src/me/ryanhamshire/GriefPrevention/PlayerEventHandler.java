@@ -429,20 +429,6 @@ class PlayerEventHandler implements Listener
 		
 		//check inventory, may need pvp protection
 		GriefPrevention.instance.checkPvpProtectionNeeded(event.getPlayer());
-		
-		//how long since the last logout?
-		long elapsed = Calendar.getInstance().getTimeInMillis() - playerData.lastLogout;
-		
-		//remember message, then silence it.  may broadcast it later
-		String message = event.getJoinMessage();
-		event.setJoinMessage(null);
-		
-		if(message != null && elapsed >= GriefPrevention.NOTIFICATION_SECONDS * 1000)
-		{
-			//start a timer for a delayed join notification message (will only show if player is still online in 30 seconds)
-			JoinLeaveAnnouncementTask task = new JoinLeaveAnnouncementTask(event.getPlayer(), message, true);		
-			GriefPrevention.instance.getServer().getScheduler().scheduleSyncDelayedTask(GriefPrevention.instance, task, 20L * GriefPrevention.NOTIFICATION_SECONDS);
-		}
 	}
 	
 	//when a player quits...
@@ -488,20 +474,8 @@ class PlayerEventHandler implements Listener
 			if(player.getHealth() > 0) player.setHealth(0);  //might already be zero from above, this avoids a double death message
 		}
 		
-		//how long was the player online?
-		long now = Calendar.getInstance().getTimeInMillis();
-		long elapsed = now - playerData.lastLogin.getTime();
-		
 		//remember logout time
 		playerData.lastLogout = Calendar.getInstance().getTimeInMillis();
-		
-		//if notification message isn't null and the player has been online for at least 30 seconds...
-		if(notificationMessage != null && elapsed >= 1000 * GriefPrevention.NOTIFICATION_SECONDS)
-		{
-			//start a timer for a delayed leave notification message (will only show if player is still offline in 30 seconds)
-			JoinLeaveAnnouncementTask task = new JoinLeaveAnnouncementTask(player, notificationMessage, false);		
-			GriefPrevention.instance.getServer().getScheduler().scheduleSyncDelayedTask(GriefPrevention.instance, task, 20L * GriefPrevention.NOTIFICATION_SECONDS);		
-		}
 	}
 
 	//when a player drops an item
