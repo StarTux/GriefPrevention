@@ -217,7 +217,6 @@ public class DataStore
 				//if that's a chest claim, delete it
 				if(claim.getArea() <= areaOfDefaultClaim)
 				{
-					claim.removeSurfaceFluids(null);
 					this.deleteClaim(claim);
 					GriefPrevention.AddLogEntry(" " + playerName + "'s new player claim expired.");
 				}
@@ -1087,7 +1086,6 @@ public class DataStore
 		//delete them one by one
 		for(int i = 0; i < claimsToDelete.size(); i++)
 		{
-			claimsToDelete.get(i).removeSurfaceFluids(null);
 			this.deleteClaim(claimsToDelete.get(i));
 		}					
 	}

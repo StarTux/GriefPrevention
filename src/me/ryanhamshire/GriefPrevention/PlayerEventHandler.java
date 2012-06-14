@@ -1254,8 +1254,6 @@ class PlayerEventHandler implements Listener
 							return;
 						}
 						
-						//remove surface fluids about to be unclaimed
-						oldClaim.removeSurfaceFluids(newClaim);
 					}
 				}
 				

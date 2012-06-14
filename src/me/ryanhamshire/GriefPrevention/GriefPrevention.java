@@ -1048,7 +1048,6 @@ public class GriefPrevention extends JavaPlugin
 					}
 					else
 					{
-						claim.removeSurfaceFluids(null);
 						this.dataStore.deleteClaim(claim);
 						GriefPrevention.sendMessage(player, TextMode.Success, "Claim deleted.");
 						GriefPrevention.AddLogEntry(player.getName() + " deleted " + claim.getOwnerName() + "'s claim at " + GriefPrevention.getfriendlyLocationString(claim.getLesserBoundaryCorner()));
@@ -1340,7 +1339,6 @@ public class GriefPrevention extends JavaPlugin
 		else
 		{
 			//delete it
-			claim.removeSurfaceFluids(null);
 			this.dataStore.deleteClaim(claim);
 			
 			//tell the player how many claim blocks he has left
