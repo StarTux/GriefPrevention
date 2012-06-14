@@ -81,14 +81,6 @@ public class GriefPrevention extends JavaPlugin
 	public ArrayList<World> config_siege_enabledWorlds;				//whether or not /siege is enabled on this server
 	public ArrayList<Material> config_siege_blocks;					//which blocks will be breakable in siege mode
 		
-	public boolean config_spam_enabled;								//whether or not to monitor for spam
-	public int config_spam_loginCooldownMinutes;					//how long players must wait between logins.  combats login spam.
-	public ArrayList<String> config_spam_monitorSlashCommands;  	//the list of slash commands monitored for spam
-	public boolean config_spam_banOffenders;						//whether or not to ban spammers automatically
-	public String config_spam_banMessage;							//message to show an automatically banned player
-	public String config_spam_warningMessage;						//message to show a player who is close to spam level
-	public String config_spam_allowedIpAddresses;					//IP addresses which will not be censored
-	
 	public boolean config_pvp_protectFreshSpawns;					//whether to make newly spawned players immune until they pick up an item
 	public boolean config_pvp_punishLogout;						    //whether to kill players who log out during PvP combat
 	public int config_pvp_combatTimeoutSeconds;						//how long combat is considered to continue after the most recent damage
@@ -214,14 +206,6 @@ public class GriefPrevention extends JavaPlugin
 		this.config_claims_expirationDays = config.getInt("GriefPrevention.Claims.IdleLimitDays", 0);
 		this.config_claims_trappedCooldownHours = config.getInt("GriefPrevention.Claims.TrappedCommandCooldownHours", 8);
 		
-		this.config_spam_enabled = config.getBoolean("GriefPrevention.Spam.Enabled", true);
-		this.config_spam_loginCooldownMinutes = config.getInt("GriefPrevention.Spam.LoginCooldownMinutes", 2);
-		this.config_spam_warningMessage = config.getString("GriefPrevention.Spam.WarningMessage", "Please reduce your noise level.  Spammers will be banned.");
-		this.config_spam_allowedIpAddresses = config.getString("GriefPrevention.Spam.AllowedIpAddresses", "1.2.3.4; 5.6.7.8");
-		this.config_spam_banOffenders = config.getBoolean("GriefPrevention.Spam.BanOffenders", true);		
-		this.config_spam_banMessage = config.getString("GriefPrevention.Spam.BanMessage", "Banned for spam.");
-		String slashCommandsToMonitor = config.getString("GriefPrevention.Spam.MonitorSlashCommands", "/me;/tell;/global;/local");
-		
 		this.config_pvp_protectFreshSpawns = config.getBoolean("GriefPrevention.PvP.ProtectFreshSpawns", true);
 		this.config_pvp_punishLogout = config.getBoolean("GriefPrevention.PvP.PunishLogout", true);
 		this.config_pvp_combatTimeoutSeconds = config.getInt("GriefPrevention.PvP.CombatTimeoutSeconds", 15);
@@ -328,14 +312,6 @@ public class GriefPrevention extends JavaPlugin
 		config.set("GriefPrevention.Claims.IdleLimitDays", this.config_claims_expirationDays);
 		config.set("GriefPrevention.Claims.TrappedCommandCooldownHours", this.config_claims_trappedCooldownHours);
 		
-		config.set("GriefPrevention.Spam.Enabled", this.config_spam_enabled);
-		config.set("GriefPrevention.Spam.LoginCooldownMinutes", this.config_spam_loginCooldownMinutes);
-		config.set("GriefPrevention.Spam.MonitorSlashCommands", slashCommandsToMonitor);
-		config.set("GriefPrevention.Spam.WarningMessage", this.config_spam_warningMessage);
-		config.set("GriefPrevention.Spam.BanOffenders", this.config_spam_banOffenders);		
-		config.set("GriefPrevention.Spam.BanMessage", this.config_spam_banMessage);
-		config.set("GriefPrevention.Spam.AllowedIpAddresses", this.config_spam_allowedIpAddresses);
-		
 		config.set("GriefPrevention.PvP.ProtectFreshSpawns", this.config_pvp_protectFreshSpawns);
 		config.set("GriefPrevention.PvP.PunishLogout", this.config_pvp_punishLogout);
 		config.set("GriefPrevention.PvP.CombatTimeoutSeconds", this.config_pvp_combatTimeoutSeconds);
@@ -365,14 +341,6 @@ public class GriefPrevention extends JavaPlugin
 		catch(IOException exception)
 		{
 			AddLogEntry("Unable to write to the configuration file at \"" + DataStore.configFilePath + "\"");
-		}
-		
-		//try to parse the list of commands which should be monitored for spam
-		this.config_spam_monitorSlashCommands = new ArrayList<String>();
-		String [] commands = slashCommandsToMonitor.split(";");
-		for(int i = 0; i < commands.length; i++)
-		{
-			this.config_spam_monitorSlashCommands.add(commands[i].trim());
 		}
 		
 		//when datastore initializes, it loads player and claim data, and posts some stats to the log

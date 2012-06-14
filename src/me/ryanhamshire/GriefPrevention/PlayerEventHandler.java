@@ -62,171 +62,17 @@ class PlayerEventHandler implements Listener
 		this.dataStore = dataStore;
 	}
 	
-	//when a player chats, monitor for spam
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
 	void onPlayerChat (PlayerChatEvent event)
 	{		
 		Player player = event.getPlayer();
 		String message = event.getMessage();
-		
 		//FEATURE: automatically educate players about the /trapped command
-		
 		//check for "trapped" or "stuck" to educate players about the /trapped command
 		if(message.contains("trapped") || message.contains("stuck"))
 		{
 			GriefPrevention.sendMessage(player, TextMode.Info, "Are you trapped in someone's claim?  Consider the /trapped command.");
 		}
-		
-		//FEATURE: monitor for chat and command spam
-		
-		if(!GriefPrevention.instance.config_spam_enabled) return;
-		
-		//if the player has permission to spam, don't bother even examining the message
-		if(player.hasPermission("griefprevention.spam")) return;
-		
-		//remedy any CAPS SPAM without bothering to fault the player for it
-		if(message.length() > 4 && message.toUpperCase().equals(message))
-		{
-			event.setMessage(message.toLowerCase());
-		}
-		
-		//where spam is concerned, casing isn't significant
-		message = message.toLowerCase();
-		
-		PlayerData playerData = this.dataStore.getPlayerData(player.getName());
-		
-		boolean spam = false;
-		boolean muted = false;
-		
-		//filter IP addresses
-		if(!(event instanceof PlayerCommandPreprocessEvent))
-		{
-			Pattern ipAddressPattern = Pattern.compile("\\d+\\.\\d+\\.\\d+\\.\\d+");
-			Matcher matcher = ipAddressPattern.matcher(event.getMessage());
-			
-			//if it looks like an IP address
-			while(matcher.find())
-			{
-				//and it's not in the list of allowed IP addresses
-				if(!GriefPrevention.instance.config_spam_allowedIpAddresses.contains(matcher.group()))
-				{
-					//log entry
-					GriefPrevention.AddLogEntry("Muted IP address from " + player.getName() + ": " + event.getMessage());
-					
-					//spam notation
-					playerData.spamCount++;
-					spam = true;
-					
-					//block message
-					muted = true;
-				}
-			}
-		}
-		
-		//check message content and timing		
-		long millisecondsSinceLastMessage = (new Date()).getTime() - playerData.lastMessageTimestamp.getTime();
-		
-		//if the message came too close to the last one
-		if(millisecondsSinceLastMessage < 3000)
-		{
-			//increment the spam counter
-			playerData.spamCount++;
-			spam = true;
-		}
-		
-		//if it's very similar to the last message
-		if(this.stringsAreSimilar(message, playerData.lastMessage))
-		{
-			playerData.spamCount++;
-			spam = true;
-			muted = true;
-		}
-		
-		//if the message was mostly non-alpha-numerics or doesn't include much whitespace, consider it a spam (probably ansi art or random text gibberish) 
-		if(message.length() > 5)
-		{
-			int symbolsCount = 0;
-			int whitespaceCount = 0;
-			for(int i = 0; i < message.length(); i++)
-			{
-				char character = message.charAt(i);
-				if(!(Character.isLetterOrDigit(character)))
-				{
-					symbolsCount++;
-				}
-				
-				if(Character.isWhitespace(character))
-				{
-					whitespaceCount++;
-				}
-			}
-			
-			if(symbolsCount > message.length() / 2 || (message.length() > 15 && whitespaceCount < message.length() / 10))
-			{
-				spam = true;
-				playerData.spamCount++;
-			}
-		}
-		
-		//if the message was determined to be a spam, consider taking action		
-		if(!player.hasPermission("griefprevention.spam") && spam)
-		{		
-			//anything above level 4 for a player which has received a warning...  kick or if enabled, ban 
-			if(playerData.spamCount > 4 && playerData.spamWarned)
-			{
-				if(GriefPrevention.instance.config_spam_banOffenders)
-				{
-					//log entry
-					GriefPrevention.AddLogEntry("Banning " + player.getName() + " for spam.");
-					
-					//ban
-					GriefPrevention.instance.getServer().getOfflinePlayer(player.getName()).setBanned(true);
-					
-					//kick
-					player.kickPlayer(GriefPrevention.instance.config_spam_banMessage);
-				}	
-				else
-				{
-					player.kickPlayer("");
-				}
-			}
-			
-			//cancel any messages while at or above the third spam level and issue warnings
-			//anything above level 2, mute and warn
-			if(playerData.spamCount >= 3)
-			{
-				muted = true;
-				if(!playerData.spamWarned)
-				{
-					GriefPrevention.sendMessage(player, TextMode.Warn, GriefPrevention.instance.config_spam_warningMessage);
-					GriefPrevention.AddLogEntry("Warned " + player.getName() + " about spam penalties.");
-					playerData.spamWarned = true;
-				}
-			}
-			
-			if(muted)
-			{
-				//cancel the event and make a log entry
-				//cancelling the event guarantees players don't receive the message
-				event.setCancelled(true);
-				GriefPrevention.AddLogEntry("Muted spam from " + player.getName() + ": " + message);
-				
-				//send a fake message so the player doesn't realize he's muted
-				//less information for spammers = less effective spam filter dodging
-				player.sendMessage("<" + player.getName() + "> " + event.getMessage());
-			}		
-		}
-		
-		//otherwise if not a spam, reset the spam counter for this player
-		else
-		{
-			playerData.spamCount = 0;
-			playerData.spamWarned = false;
-		}
-		
-		//in any case, record the timestamp of this message and also its content for next time
-		playerData.lastMessageTimestamp = new Date();
-		playerData.lastMessage = message;	
 	}
 	
 	//if two strings are 75% identical, they're too close to follow each other in the chat
@@ -271,75 +117,6 @@ class PlayerEventHandler implements Listener
 		return false;
 	}
 
-	//when a player uses a slash command, monitor for spam
-	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
-	void onPlayerCommandPreprocess (PlayerCommandPreprocessEvent event)
-	{
-		if(!GriefPrevention.instance.config_spam_enabled) return;
-		
-		//if the slash command used is in the list of monitored commands, treat it like a chat message (see above)
-		String [] args = event.getMessage().split(" ");
-		if(GriefPrevention.instance.config_spam_monitorSlashCommands.contains(args[0])) this.onPlayerChat(event);
-		
-		if(GriefPrevention.instance.config_eavesdrop && args[0].equalsIgnoreCase("/tell") && !event.getPlayer().hasPermission("griefprevention.eavesdrop") && args.length > 2)
-		{			
-			StringBuilder logMessageBuilder = new StringBuilder();
-			logMessageBuilder.append("[").append(event.getPlayer().getName()).append(" > ").append(args[1]).append("] ");			
-			
-			for(int i = 2; i < args.length; i++)
-			{
-				logMessageBuilder.append(args[i]).append(" ");
-			}
-			
-			String logMessage = logMessageBuilder.toString();
-			
-			GriefPrevention.AddLogEntry(logMessage.toString());
-			
-			Player [] players = GriefPrevention.instance.getServer().getOnlinePlayers();
-			for(int i = 0; i < players.length; i++)
-			{
-				Player player = players[i];
-				if(player.hasPermission("griefprevention.eavesdrop") && !player.getName().equalsIgnoreCase(args[1]))
-				{
-					player.sendMessage(ChatColor.GRAY + logMessage);
-				}
-			}
-		}
-	}
-	
-	//when a player attempts to join the server...
-	@EventHandler(priority = EventPriority.HIGHEST)
-	void onPlayerLogin (PlayerLoginEvent event)
-	{
-		Player player = event.getPlayer();
-		
-		//all this is anti-spam code
-		if(GriefPrevention.instance.config_spam_enabled)
-		{
-			//FEATURE: login cooldown to prevent login/logout spam with custom clients
-			
-			//if allowed to join and login cooldown enabled
-			if(GriefPrevention.instance.config_spam_loginCooldownMinutes > 0 && event.getResult() == Result.ALLOWED)
-			{
-				//determine how long since last login and cooldown remaining
-				PlayerData playerData = this.dataStore.getPlayerData(player.getName());
-				long millisecondsSinceLastLogin = (new Date()).getTime() - playerData.lastLogin.getTime();
-				long minutesSinceLastLogin = millisecondsSinceLastLogin / 1000 / 60;
-				long cooldownRemaining = GriefPrevention.instance.config_spam_loginCooldownMinutes - minutesSinceLastLogin;
-				
-				//if cooldown remaining and player doesn't have permission to spam
-				if(cooldownRemaining > 0 && !player.hasPermission("griefprevention.spam"))
-				{
-					//DAS BOOT!
-					event.setResult(Result.KICK_OTHER);				
-					event.setKickMessage("You must wait " + cooldownRemaining + " more minutes before logging-in again.");
-					event.disallow(event.getResult(), event.getKickMessage());
-					return;
-				}
-			}
-		}
-	}
-	
 	//when a player spawns, conditionally apply temporary pvp protection 
 	@EventHandler(ignoreCancelled = true)
 	void onPlayerRespawn (PlayerRespawnEvent event)

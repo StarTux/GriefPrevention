@@ -66,10 +66,6 @@ public class PlayerData
 	
 	//spam
 	public Date lastLogin;							//when the player last logged into the server
-	public String lastMessage = "";					//the player's last chat message, or slash command complete with parameters 
-	public Date lastMessageTimestamp = new Date();	//last time the player sent a chat message or used a monitored slash command
-	public int spamCount = 0;						//number of consecutive "spams"
-	public boolean spamWarned = false;				//whether the player recently received a warning
 	
 	//last logout timestamp, default to long enough to trigger a join message, see player join event
 	public long lastLogout = Calendar.getInstance().getTimeInMillis() - GriefPrevention.NOTIFICATION_SECONDS * 2000;

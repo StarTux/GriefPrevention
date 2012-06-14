@@ -179,34 +179,6 @@ public class BlockEventHandler implements Listener
 		}
 	}
 	
-	//when a player places a sign...
-	@EventHandler(ignoreCancelled = true)
-	public void onSignChanged(SignChangeEvent event)
-	{
-		Player player = event.getPlayer();
-		if(player == null) return;
-		
-		StringBuilder lines = new StringBuilder();
-		boolean notEmpty = false;
-		for(int i = 0; i < event.getLines().length; i++)
-		{
-			if(event.getLine(i).length() != 0) notEmpty = true;
-			lines.append(event.getLine(i) + ";");
-		}
-		
-		String signMessage = lines.toString();
-		
-		//if not empty and wasn't the same as the last sign, log it and remember it for later
-		PlayerData playerData = this.dataStore.getPlayerData(player.getName());
-		if(notEmpty && playerData.lastMessage != null && !playerData.lastMessage.equals(signMessage))
-		{		
-			GriefPrevention.AddLogEntry("[Sign Placement] <" + player.getName() + "> " + lines.toString());
-			GriefPrevention.AddLogEntry("Location: " + GriefPrevention.getfriendlyLocationString(event.getBlock().getLocation()));
-			
-			playerData.lastMessage = signMessage;
-		}
-	}
-	
 	//when a player places a block...
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
 	public void onBlockPlace(BlockPlaceEvent placeEvent)
