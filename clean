@@ -1,0 +1,4 @@
+#!/bin/bash
+
+rm -rvf target
+rm -vf libs files GriefPrevention.jar
