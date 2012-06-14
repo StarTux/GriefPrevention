@@ -53,9 +53,6 @@ class PlayerEventHandler implements Listener
 {
 	private DataStore dataStore;
 	
-	//list of temporarily banned ip's
-	private ArrayList<IpBanInfo> tempBannedIps = new ArrayList<IpBanInfo>();
-	
 	//number of milliseconds in a day
 	private final long MILLISECONDS_IN_DAY = 1000 * 60 * 60 * 24;
 	
@@ -341,69 +338,6 @@ class PlayerEventHandler implements Listener
 				}
 			}
 		}
-		
-		//remember the player's ip address
-		PlayerData playerData = this.dataStore.getPlayerData(player.getName());
-		playerData.ipAddress = event.getAddress();
-		
-		//FEATURE: auto-ban accounts who use an IP address which was very recently used by another banned account
-		if(GriefPrevention.instance.config_smartBan)
-		{		
-			//if logging-in account is banned, remember IP address for later
-			long now = Calendar.getInstance().getTimeInMillis();
-			if(event.getResult() == Result.KICK_BANNED)
-			{
-				this.tempBannedIps.add(new IpBanInfo(event.getAddress(), now + this.MILLISECONDS_IN_DAY, player.getName()));
-			}
-			
-			//otherwise if not banned
-			else
-			{
-				//search temporarily banned IP addresses for this one
-				for(int i = 0; i < this.tempBannedIps.size(); i++)
-				{
-					IpBanInfo info = this.tempBannedIps.get(i);
-					String address = info.address.toString();
-					
-					//eliminate any expired entries
-					if(now > info.expirationTimestamp)
-					{
-						this.tempBannedIps.remove(i--);
-					}
-					
-					//if we find a match				
-					else if(address.equals(playerData.ipAddress.toString()))
-					{
-						//if the account associated with the IP ban has been pardoned, remove all ip bans for that ip and we're done
-						OfflinePlayer bannedPlayer = GriefPrevention.instance.getServer().getOfflinePlayer(info.bannedAccountName);
-						if(!bannedPlayer.isBanned())
-						{
-							for(int j = 0; j < this.tempBannedIps.size(); j++)
-							{
-								IpBanInfo info2 = this.tempBannedIps.get(j);
-								if(info2.address.toString().equals(address))
-								{
-									OfflinePlayer bannedAccount = GriefPrevention.instance.getServer().getOfflinePlayer(info2.bannedAccountName);
-									bannedAccount.setBanned(false);
-									this.tempBannedIps.remove(j--);
-								}
-							}
-							
-							break;
-						}
-						
-						//otherwise if that account is still banned, ban this account, too
-						else
-						{
-							player.setBanned(true);
-							event.setResult(Result.KICK_BANNED);				
-							event.disallow(event.getResult(), "");
-							GriefPrevention.AddLogEntry("Auto-banned " + player.getName() + " because that account is using an IP address very recently used by banned player " + info.bannedAccountName + " (" + info.address.toString() + ").");
-						}
-					}
-				}
-			}
-		}
 	}
 	
 	//when a player spawns, conditionally apply temporary pvp protection 
@@ -429,19 +363,6 @@ class PlayerEventHandler implements Listener
 		
 		//check inventory, may need pvp protection
 		GriefPrevention.instance.checkPvpProtectionNeeded(event.getPlayer());
-	}
-	
-	//when a player quits...
-	@EventHandler(priority = EventPriority.HIGHEST)
-	void onPlayerKicked(PlayerKickEvent event)
-	{
-		Player player = event.getPlayer();
-		PlayerData playerData = this.dataStore.getPlayerData(player.getName());
-		if(player.isBanned())
-		{
-			long now = Calendar.getInstance().getTimeInMillis(); 
-			this.tempBannedIps.add(new IpBanInfo(playerData.ipAddress, now + this.MILLISECONDS_IN_DAY, player.getName()));
-		}	
 	}
 	
 	//when a player quits...

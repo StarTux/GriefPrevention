@@ -108,8 +108,6 @@ public class GriefPrevention extends JavaPlugin
 	public boolean config_addItemsToClaimedChests;					//whether players may add items to claimed chests by left-clicking them
 	public boolean config_eavesdrop; 								//whether whispered messages will be visible to administrators
 	
-	public boolean config_smartBan;									//whether to ban accounts which very likely owned by a banned player
-	
 	//reference to the economy plugin, if economy integration is enabled
 	public static Economy economy = null;					
 	
@@ -243,8 +241,6 @@ public class GriefPrevention extends JavaPlugin
 		this.config_addItemsToClaimedChests = config.getBoolean("GriefPrevention.AddItemsToClaimedChests", true);
 		this.config_eavesdrop = config.getBoolean("GriefPrevention.EavesdropEnabled", false);
 		
-		this.config_smartBan = config.getBoolean("GriefPrevention.SmartBan", true);
-		
 		//default for siege worlds list
 		ArrayList<String> defaultSiegeWorldNames = new ArrayList<String>();
 		
@@ -358,8 +354,6 @@ public class GriefPrevention extends JavaPlugin
 		
 		config.set("GriefPrevention.AddItemsToClaimedChests", this.config_addItemsToClaimedChests);
 		config.set("GriefPrevention.EavesdropEnabled", this.config_eavesdrop);
-		
-		config.set("GriefPrevention.SmartBan", this.config_smartBan);
 		
 		config.set("GriefPrevention.Siege.Worlds", siegeEnabledWorldNames);
 		config.set("GriefPrevention.Siege.BreakableBlocks", breakableBlocksList);

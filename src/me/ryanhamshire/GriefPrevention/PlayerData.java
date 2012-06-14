@@ -97,8 +97,6 @@ public class PlayerData
 	//safety confirmation for deleting multi-subdivision claims
 	public boolean warnedAboutMajorDeletion = false;
 
-	public InetAddress ipAddress;
-	
 	PlayerData()
 	{
 		//default last login date value to a year ago to ensure a brand new player can log in
