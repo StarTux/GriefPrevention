@@ -371,50 +371,6 @@ public class GriefPrevention extends JavaPlugin
 			return true;
 		}
 		
-		//restore nature
-		else if(cmd.getName().equalsIgnoreCase("restorenature") && player != null)
-		{
-			//change shovel mode
-			PlayerData playerData = this.dataStore.getPlayerData(player.getName());
-			playerData.shovelMode = ShovelMode.RestoreNature;
-			GriefPrevention.sendMessage(player, TextMode.Instr, "Ready to restore some nature!  Right click to restore nature, and use /BasicClaims to stop.");
-			return true;
-		}
-		
-		//restore nature aggressive mode
-		else if(cmd.getName().equalsIgnoreCase("restorenatureaggressive") && player != null)
-		{
-			//change shovel mode
-			PlayerData playerData = this.dataStore.getPlayerData(player.getName());
-			playerData.shovelMode = ShovelMode.RestoreNatureAggressive;
-			GriefPrevention.sendMessage(player, TextMode.Warn, "Aggressive mode activated.  Do NOT use this underneath anything you want to keep!  Right click to aggressively restore nature, and use /BasicClaims to stop.");
-			return true;
-		}
-		
-		//restore nature fill mode
-		else if(cmd.getName().equalsIgnoreCase("restorenaturefill") && player != null)
-		{
-			//change shovel mode
-			PlayerData playerData = this.dataStore.getPlayerData(player.getName());
-			playerData.shovelMode = ShovelMode.RestoreNatureFill;
-			
-			//set radius based on arguments
-			playerData.fillRadius = 2;
-			if(args.length > 0)
-			{
-				try
-				{
-					playerData.fillRadius = Integer.parseInt(args[0]);
-				}
-				catch(Exception exception){ }
-			}
-			
-			if(playerData.fillRadius < 0) playerData.fillRadius = 2;
-			
-			GriefPrevention.sendMessage(player, TextMode.Success, "Fill mode activated with radius " + playerData.fillRadius + ".  Right-click an area to fill.");
-			return true;
-		}
-		
 		//trust <player>
 		else if(cmd.getName().equalsIgnoreCase("trust") && player != null)
 		{

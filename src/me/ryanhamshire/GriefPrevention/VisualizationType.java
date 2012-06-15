@@ -23,6 +23,5 @@ public enum VisualizationType
 {
 	Claim,
 	Subdivision,
-	ErrorClaim,
-	RestoreNature
+	ErrorClaim
 }

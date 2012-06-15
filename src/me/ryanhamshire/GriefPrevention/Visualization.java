@@ -127,12 +127,6 @@ public class Visualization
 			accentMaterial = Material.WOOL;
 		}
 		
-		else if(visualizationType == VisualizationType.RestoreNature)
-		{
-			cornerMaterial = Material.DIAMOND_BLOCK;
-			accentMaterial = Material.DIAMOND_BLOCK;
-		}
-		
 		else
 		{
 			cornerMaterial = Material.LAVA;

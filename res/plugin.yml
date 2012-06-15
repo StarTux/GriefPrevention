@@ -55,21 +55,6 @@ commands:
       usage: /AdminClaims
       permission: griefprevention.adminclaims
       aliases: ac
-   restorenature:
-      description: Switches the shovel tool to restoration mode.
-      usage: /RestoreNature 
-      permission: griefprevention.restorenature
-      aliases: rn
-   restorenatureaggressive:
-      description: Switches the shovel tool to aggressive restoration mode.
-      usage: /RestoreNatureAggressive 
-      permission: griefprevention.restorenatureaggressive
-      aliases: rna
-   restorenaturefill:
-      description: Switches the shovel tool to fill mode.
-      usage: /RestoreNatureFill <radius> 
-      permission: griefprevention.restorenatureaggressive
-      aliases: rnf
    basicclaims:
       description: Switches the shovel tool back to basic claims mode.
       usage: /BasicClaims
@@ -108,8 +93,6 @@ permissions:
     griefprevention.admin.*:
         description: Grants all administrative functionality.
         children:
-            griefprevention.restorenature: true
-            griefprevention.restorenatureaggressive: true
             griefprevention.ignoreclaims: true
             griefprevention.adminclaims: true
             griefprevention.adjustclaimblocks: true
@@ -117,9 +100,6 @@ permissions:
             griefprevention.spam: true
             griefprevention.lava: true
             griefprevention.eavesdrop: true
-    griefprevention.restorenature:
-        description: Grants permission to use /RestoreNature.
-        default: op
     griefprevention.ignoreclaims:
         description: Grants permission to use /IgnoreClaims.
         default: op
@@ -140,7 +120,4 @@ permissions:
         default: op
     griefprevention.eavesdrop:
         description: Allows a player to see whispered chat messages (/tell).
-        default: op
-    griefprevention.restorenatureaggressive:
-        description: Grants access to /RestoreNatureAggressive and /RestoreNatureFill.
         default: op
