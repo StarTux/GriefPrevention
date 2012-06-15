@@ -89,14 +89,6 @@ public class BlockEventHandler implements Listener
 				this.dataStore.extendClaim(claim, claim.getLesserBoundaryCorner().getBlockY() - GriefPrevention.instance.config_claims_claimsExtendIntoGroundDistance);
 			}
 		}
-		
-		//FEATURE: automatically clean up hanging treetops
-		//if it's a log
-		if(block.getType() == Material.LOG && GriefPrevention.instance.config_trees_removeFloatingTreetops)
-		{
-			//run the specialized code for treetop removal (see below)
-			GriefPrevention.instance.handleLogBroken(block);
-		}
 	}
 	
 	//when a player places a block...
@@ -310,42 +302,6 @@ public class BlockEventHandler implements Listener
 			if(fromOwner == null || fromOwner.getPlayer() == null || toClaim.allowBuild(fromOwner.getPlayer()) != null)
 			{
 				spreadEvent.setCancelled(true);
-			}
-		}
-	}
-	
-	@EventHandler(ignoreCancelled = true)
-	public void onTreeGrow (StructureGrowEvent growEvent)
-	{
-		Location rootLocation = growEvent.getLocation();
-		Claim rootClaim = this.dataStore.getClaimAt(rootLocation, false, null);
-		
-		//who owns the root, if anyone?
-		//who owns the spreading block, if anyone?
-		OfflinePlayer fromOwner = null;			
-		if(rootClaim != null)
-		{
-			//if an administrative claim, just let the tree grow where it wants
-			if(rootClaim.isAdminClaim()) return;
-			
-			//otherwise, note the owner of the claim
-			fromOwner = GriefPrevention.instance.getServer().getOfflinePlayer(rootClaim.ownerName);
-		}
-		
-		//for each block growing
-		for(int i = 0; i < growEvent.getBlocks().size(); i++)
-		{
-			BlockState block = growEvent.getBlocks().get(i);
-			Claim blockClaim = this.dataStore.getClaimAt(block.getLocation(), false, rootClaim);
-			
-			//if it's growing into a claim
-			if(blockClaim != null)
-			{
-				//if there's no owner for the new tree, or the owner doesn't have permission to build in the claim, don't grow this block
-				if(fromOwner == null  || fromOwner.getPlayer() == null || blockClaim.allowBuild(fromOwner.getPlayer()) != null)
-				{
-					growEvent.getBlocks().remove(i--);
-				}
 			}
 		}
 	}
