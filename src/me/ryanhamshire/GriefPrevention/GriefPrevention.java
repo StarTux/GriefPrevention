@@ -81,8 +81,6 @@ public class GriefPrevention extends JavaPlugin
 	public double config_economy_claimBlocksPurchaseCost;			//cost to purchase a claim block.  set to zero to disable purchase.
 	public double config_economy_claimBlocksSellValue;				//return on a sold claim block.  set to zero to disable sale.
 	
-	public boolean config_blockSurfaceExplosions;					//whether creeper/TNT explosions near or above the surface destroy blocks
-	
 	public boolean config_fireSpreads;								//whether fire spreads outside of claims
 	public boolean config_fireDestroys;								//whether fire destroys blocks outside of claims
 	
@@ -195,8 +193,6 @@ public class GriefPrevention extends JavaPlugin
 		this.config_economy_claimBlocksPurchaseCost = config.getDouble("GriefPrevention.Economy.ClaimBlocksPurchaseCost", 0);
 		this.config_economy_claimBlocksSellValue = config.getDouble("GriefPrevention.Economy.ClaimBlocksSellValue", 0);
 		
-		this.config_blockSurfaceExplosions = config.getBoolean("GriefPrevention.BlockSurfaceExplosions", true);
-		
 		this.config_fireSpreads = config.getBoolean("GriefPrevention.FireSpreads", false);
 		this.config_fireDestroys = config.getBoolean("GriefPrevention.FireDestroys", false);
 		
@@ -220,8 +216,6 @@ public class GriefPrevention extends JavaPlugin
 		
 		config.set("GriefPrevention.Economy.ClaimBlocksPurchaseCost", this.config_economy_claimBlocksPurchaseCost);
 		config.set("GriefPrevention.Economy.ClaimBlocksSellValue", this.config_economy_claimBlocksSellValue);
-		
-		config.set("GriefPrevention.BlockSurfaceExplosions", this.config_blockSurfaceExplosions);
 		
 		config.set("GriefPrevention.FireSpreads", this.config_fireSpreads);
 		config.set("GriefPrevention.FireDestroys", this.config_fireDestroys);

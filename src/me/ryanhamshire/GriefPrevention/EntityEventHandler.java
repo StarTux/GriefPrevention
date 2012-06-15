@@ -1,20 +1,20 @@
 /*
-    GriefPrevention Server Plugin for Minecraft
-    Copyright (C) 2012 Ryan Hamshire
+  GriefPrevention Server Plugin for Minecraft
+  Copyright (C) 2012 Ryan Hamshire
 
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation, either version 3 of the License, or
+  (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+  You should have received a copy of the GNU General Public License
+  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
 package me.ryanhamshire.GriefPrevention;
 
@@ -43,7 +43,6 @@ import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
-import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.ItemSpawnEvent;
 import org.bukkit.event.painting.PaintingBreakByEntityEvent;
 import org.bukkit.event.painting.PaintingBreakEvent;
@@ -58,98 +57,6 @@ class EntityEventHandler implements Listener
 	public EntityEventHandler(DataStore dataStore)
 	{
 		this.dataStore = dataStore;
-	}
-	
-	//when an entity explodes...
-	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
-	public void onEntityExplode(EntityExplodeEvent explodeEvent)
-	{		
-		List<Block> blocks = explodeEvent.blockList();
-		Location location = explodeEvent.getLocation();
-		
-		//FEATURE: explosions don't destroy blocks when they explode near or above sea level in standard worlds
-		
-		if(GriefPrevention.instance.config_blockSurfaceExplosions && location.getWorld().getEnvironment() == Environment.NORMAL)
-		{
-			if(location.getBlockY() >location.getWorld().getSeaLevel() - 7)
-			{
-				blocks.clear();  //explosion still happens, can damage creatures/players, but no blocks will be destroyed
-				return;
-			}
-		}
-		
-		//special rule for creative worlds: explosions don't destroy anything
-		if(GriefPrevention.instance.creativeRulesApply(explodeEvent.getLocation()))
-		{
-			blocks.clear();
-		}
-		
-		//FEATURE: creating an explosion near a claim doesn't damage any of the claimed blocks
-	
-		Claim claim = null;
-		for(int i = 0; i < blocks.size(); i++)  //for each destroyed block
-		{
-			Block block = blocks.get(i);
-			if(block.getType() == Material.AIR) continue;  //if it's air, we don't care
-			
-			claim = this.dataStore.getClaimAt(block.getLocation(), false, claim); 
-			//if the block is claimed, remove it from the list of destroyed blocks
-			if(claim != null)
-			{
-				blocks.remove(i--);
-			}
-		}
-	}
-	
-	//when an item spawns...
-	@EventHandler(priority = EventPriority.LOWEST)
-	public void onItemSpawn(ItemSpawnEvent event)
-	{
-		//if in a creative world, cancel the event (don't drop items on the ground)
-		if(GriefPrevention.instance.creativeRulesApply(event.getLocation()))
-		{
-			event.setCancelled(true);
-		}
-	}
-	
-	//when a creature spawns...
-	@EventHandler(priority = EventPriority.LOWEST)
-	public void onEntitySpawn(CreatureSpawnEvent event)
-	{
-		LivingEntity entity = event.getEntity();
-		
-		//these rules apply only to creative worlds
-		if(!GriefPrevention.instance.creativeRulesApply(entity.getLocation())) return;
-		
-		//chicken eggs and breeding could potentially make a mess in the wilderness, once griefers get involved
-		SpawnReason reason = event.getSpawnReason();
-		if(reason == SpawnReason.EGG || reason == SpawnReason.BREEDING)
-		{
-			event.setCancelled(true);
-			return;
-		}
-		
-		//otherwise, just apply the limit on total entities per claim
-		Claim claim = this.dataStore.getClaimAt(event.getLocation(), false, null);
-		if(claim != null && claim.allowMoreEntities() != null)
-		{
-			event.setCancelled(true);
-			return;
-		}
-	}
-	
-	//when an entity dies...
-	@EventHandler
-	public void onEntityDeath(EntityDeathEvent event)
-	{
-		LivingEntity entity = event.getEntity();
-		
-		//special rule for creative worlds: killed entities don't drop items or experience orbs
-		if(GriefPrevention.instance.creativeRulesApply(entity.getLocation()))
-		{
-			event.setDroppedExp(0);
-			event.getDrops().clear();			
-		}
 	}
 	
 	//when an entity picks up an item
@@ -173,37 +80,37 @@ class EntityEventHandler implements Listener
 	//when a painting is broken
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
 	public void onPaintingBreak(PaintingBreakEvent event)
-    {
-        //FEATURE: claimed paintings are protected from breakage
+        {
+                //FEATURE: claimed paintings are protected from breakage
 		
 		//only allow players to break paintings, not anything else (like water and explosions)
 		if(!(event instanceof PaintingBreakByEntityEvent))
-    	{
-        	event.setCancelled(true);
-        	return;
-    	}
+                {
+                        event.setCancelled(true);
+                        return;
+                }
         
-        PaintingBreakByEntityEvent entityEvent = (PaintingBreakByEntityEvent)event;
+                PaintingBreakByEntityEvent entityEvent = (PaintingBreakByEntityEvent)event;
         
-        //who is removing it?
+                //who is removing it?
 		Entity remover = entityEvent.getRemover();
         
 		//again, making sure the breaker is a player
 		if(!(remover instanceof Player))
-        {
-        	event.setCancelled(true);
-        	return;
-        }
+                {
+                        event.setCancelled(true);
+                        return;
+                }
 		
 		//if the player doesn't have build permission, don't allow the breakage
 		Player playerRemover = (Player)entityEvent.getRemover();
-        String noBuildReason = GriefPrevention.instance.allowBuild(playerRemover, event.getPainting().getLocation());
-        if(noBuildReason != null)
-        {
-        	event.setCancelled(true);
-        	GriefPrevention.sendMessage(playerRemover, TextMode.Err, noBuildReason);
+                String noBuildReason = GriefPrevention.instance.allowBuild(playerRemover, event.getPainting().getLocation());
+                if(noBuildReason != null)
+                {
+                        event.setCancelled(true);
+                        GriefPrevention.sendMessage(playerRemover, TextMode.Err, noBuildReason);
+                }
         }
-    }
 	
 	//when a painting is placed...
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
@@ -213,11 +120,11 @@ class EntityEventHandler implements Listener
 	
 		//if the player doesn't have permission, don't allow the placement
 		String noBuildReason = GriefPrevention.instance.allowBuild(event.getPlayer(), event.getPainting().getLocation());
-        if(noBuildReason != null)
-        {
-        	event.setCancelled(true);
-        	GriefPrevention.sendMessage(event.getPlayer(), TextMode.Err, noBuildReason);
-        }		
+                if(noBuildReason != null)
+                {
+                        event.setCancelled(true);
+                        GriefPrevention.sendMessage(event.getPlayer(), TextMode.Err, noBuildReason);
+                }		
 	}
 	
 	//when an entity is damaged
