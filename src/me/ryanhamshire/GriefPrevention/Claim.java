@@ -184,7 +184,13 @@ public class Claim
 		{
 			if(player.hasPermission("griefprevention.deleteclaims")) return null;
 		}
-		
+
+                //owners can do whatever
+                if(this.ownerName.equals(player.getName()))
+                {
+                        return null;
+                }
+
 		//permission inheritance for subdivisions
 		if(this.parent != null)
 			return this.parent.allowBuild(player);
@@ -295,7 +301,7 @@ public class Claim
 	{
 		//if we don't know who's asking, always say no (i've been told some mods can make this happen somehow)
 		if(player == null) return "";
-		
+
 		//anyone who can modify the claim, or who's explicitly in the managers (/PermissionTrust) list can do this
 		if(this.allowEdit(player) == null || this.managers.contains(player.getName())) return null;
 		
