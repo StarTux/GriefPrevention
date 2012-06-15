@@ -1,20 +1,20 @@
 /*
-    GriefPrevention Server Plugin for Minecraft
-    Copyright (C) 2012 Ryan Hamshire
+  GriefPrevention Server Plugin for Minecraft
+  Copyright (C) 2012 Ryan Hamshire
 
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation, either version 3 of the License, or
+  (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+  You should have received a copy of the GNU General Public License
+  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
 package me.ryanhamshire.GriefPrevention;
 
@@ -161,7 +161,7 @@ public class DataStore
 				//if there's any problem with the file's content, log an error message and skip it
 				catch(Exception e)
 				{
-					 GriefPrevention.AddLogEntry("Unable to load data for claim \"" + files[i].getName() + "\": " + e.getMessage());
+                                        GriefPrevention.AddLogEntry("Unable to load data for claim \"" + files[i].getName() + "\": " + e.getMessage());
 				}
 				
 				try
@@ -358,11 +358,11 @@ public class DataStore
 		}
 		
 		//convert those numerical strings to integer values
-	    int x = Integer.parseInt(xString);
-	    int y = Integer.parseInt(yString);
-	    int z = Integer.parseInt(zString);
+                int x = Integer.parseInt(xString);
+                int y = Integer.parseInt(yString);
+                int z = Integer.parseInt(zString);
 	    
-	    return new Location(world, x, y, z);
+                return new Location(world, x, y, z);
 	}	
 
 	//does the work of actually writing a claim to file
@@ -501,7 +501,7 @@ public class DataStore
 					String lastLoginTimestampString = inStream.readLine();
 					
 					//convert that to a date and store it
-				    DateFormat dateFormat = new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss");					
+                                        DateFormat dateFormat = new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss");					
 					try
 					{
 						playerData.lastLogin = dateFormat.parse(lastLoginTimestampString);
@@ -528,39 +528,39 @@ public class DataStore
 					//String claimsString = inStream.readLine();
 					inStream.readLine();
 					/*
-					if(claimsString != null && claimsString.length() > 0)
-					{
-						String [] claimsStrings = claimsString.split(";;");
-						boolean missingClaim = false;
+                                          if(claimsString != null && claimsString.length() > 0)
+                                          {
+                                          String [] claimsStrings = claimsString.split(";;");
+                                          boolean missingClaim = false;
 						
-						//search for each claim mentioned in the file
-						for(int i = 0; i < claimsStrings.length; i++)
-						{
-							String claimID = claimsStrings[i];
-							if(claimID != null)
-							{
-								Claim claim = this.getClaimAt(this.locationFromString(claimID), true, null);
+                                          //search for each claim mentioned in the file
+                                          for(int i = 0; i < claimsStrings.length; i++)
+                                          {
+                                          String claimID = claimsStrings[i];
+                                          if(claimID != null)
+                                          {
+                                          Claim claim = this.getClaimAt(this.locationFromString(claimID), true, null);
 								
-								//if the referenced claim exists, add it to the player data instance for later reference
-								if(claim != null)
-								{
-									playerData.claims.add(claim);
-								}
+                                          //if the referenced claim exists, add it to the player data instance for later reference
+                                          if(claim != null)
+                                          {
+                                          playerData.claims.add(claim);
+                                          }
 								
-								//if the claim doesn't seem to exist anymore, plan to drop the reference from the file
-								else
-								{
-									missingClaim = true;
-								}
-							}
-						}
+                                          //if the claim doesn't seem to exist anymore, plan to drop the reference from the file
+                                          else
+                                          {
+                                          missingClaim = true;
+                                          }
+                                          }
+                                          }
 						
-						//if any referenced claims no longer exist, write the player data back to file to eliminate those references
-						if(missingClaim)
-						{
-							this.savePlayerData(playerName, playerData);
-						}
-					}
+                                          //if any referenced claims no longer exist, write the player data back to file to eliminate those references
+                                          if(missingClaim)
+                                          {
+                                          this.savePlayerData(playerName, playerData);
+                                          }
+                                          }
 					*/
 					
 					//find all the claims belonging to this player and note them for future reference
@@ -579,7 +579,7 @@ public class DataStore
 				//if there's any problem with the file's content, log an error message
 				catch(Exception e)
 				{
-					 GriefPrevention.AddLogEntry("Unable to load data for player \"" + playerName + "\": " + e.getMessage());			 
+                                        GriefPrevention.AddLogEntry("Unable to load data for player \"" + playerName + "\": " + e.getMessage());			 
 				}
 				
 				try
