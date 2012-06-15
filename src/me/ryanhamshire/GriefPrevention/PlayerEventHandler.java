@@ -120,22 +120,13 @@ class PlayerEventHandler implements Listener
 	@EventHandler(priority = EventPriority.HIGHEST)
 	void onPlayerQuit(PlayerQuitEvent event)
 	{
-		this.onPlayerDisconnect(event.getPlayer(), event.getQuitMessage());
-		
-		//silence the leave message (may be broadcast later, if the player stays offline)
-		event.setQuitMessage(null);
-	}
-	
-	//helper for above
-	private void onPlayerDisconnect(Player player, String notificationMessage)
-	{
-		String playerName = player.getName();
+		String playerName = event.getPlayer().getName();
 		PlayerData playerData = this.dataStore.getPlayerData(playerName);
 		
 		//remember logout time
 		playerData.lastLogout = Calendar.getInstance().getTimeInMillis();
 	}
-
+	
 	//when a player drops an item
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void onPlayerDropItem(PlayerDropItemEvent event)
