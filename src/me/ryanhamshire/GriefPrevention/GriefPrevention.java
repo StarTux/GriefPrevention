@@ -37,7 +37,8 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
-import org.bukkit.command.*;
+import org.bukkit.command.CommandSender;
+import org.bukkit.command.Command;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
@@ -916,7 +917,7 @@ public class GriefPrevention extends JavaPlugin
 		}
 		
 		//adjustbonusclaimblocks <player> <amount>
-		else if(cmd.getName().equalsIgnoreCase("adjustbonusclaimblocks") && player != null)
+		else if(cmd.getName().equalsIgnoreCase("adjustbonusclaimblocks"))
 		{
 			//requires exactly two parameters, the other player's name and the adjustment
 			if(args.length != 2) return false;
@@ -925,7 +926,7 @@ public class GriefPrevention extends JavaPlugin
 			OfflinePlayer targetPlayer = this.resolvePlayer(args[0]);
 			if(targetPlayer == null)
 			{
-				GriefPrevention.sendMessage(player, TextMode.Err, "Player \"" + args[0] + "\" not found.");
+				GriefPrevention.sendMessage(sender, TextMode.Err, "Player \"" + args[0] + "\" not found.");
 				return true;
 			}
 			
@@ -1214,9 +1215,9 @@ public class GriefPrevention extends JavaPlugin
 	}
 	
 	//sends a color-coded message to a player
-	static void sendMessage(Player player, ChatColor color, String message)
+	static void sendMessage(CommandSender sender, ChatColor color, String message)
 	{
-		player.sendMessage(color + message);
+		sender.sendMessage(color + message);
 	}
 	
 	//determines whether creative anti-grief rules apply at a location
