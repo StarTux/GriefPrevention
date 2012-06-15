@@ -83,9 +83,6 @@ public class GriefPrevention extends JavaPlugin
 	public boolean config_fireSpreads;								//whether fire spreads outside of claims
 	public boolean config_fireDestroys;								//whether fire destroys blocks outside of claims
 	
-	public boolean config_addItemsToClaimedChests;					//whether players may add items to claimed chests by left-clicking them
-	public boolean config_eavesdrop; 								//whether whispered messages will be visible to administrators
-	
 	//reference to the economy plugin, if economy integration is enabled
 	public static Economy economy = null;					
 	
@@ -194,9 +191,6 @@ public class GriefPrevention extends JavaPlugin
 		this.config_fireSpreads = config.getBoolean("GriefPrevention.FireSpreads", false);
 		this.config_fireDestroys = config.getBoolean("GriefPrevention.FireDestroys", false);
 		
-		this.config_addItemsToClaimedChests = config.getBoolean("GriefPrevention.AddItemsToClaimedChests", true);
-		this.config_eavesdrop = config.getBoolean("GriefPrevention.EavesdropEnabled", false);
-		
 		config.set("GriefPrevention.Claims.Worlds", claimsEnabledWorldNames);
 		config.set("GriefPrevention.Claims.CreativeRulesWorlds", creativeClaimsEnabledWorldNames);
 		config.set("GriefPrevention.Claims.PreventTheft", this.config_claims_preventTheft);
@@ -216,9 +210,6 @@ public class GriefPrevention extends JavaPlugin
 		
 		config.set("GriefPrevention.FireSpreads", this.config_fireSpreads);
 		config.set("GriefPrevention.FireDestroys", this.config_fireDestroys);
-		
-		config.set("GriefPrevention.AddItemsToClaimedChests", this.config_addItemsToClaimedChests);
-		config.set("GriefPrevention.EavesdropEnabled", this.config_eavesdrop);
 		
 		try
 		{
