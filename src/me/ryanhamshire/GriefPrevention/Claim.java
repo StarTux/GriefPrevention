@@ -69,12 +69,6 @@ public class Claim
 	//note subdivisions themselves never have children
 	public ArrayList<Claim> children = new ArrayList<Claim>();
 	
-	//information about a siege involving this claim.  null means no siege is impacting this claim
-	public SiegeData siegeData = null;
-	
-	//following a siege, buttons/levers are unlocked temporarily.  this represents that state
-	public boolean doorsOpen = false;
-	
 	//whether or not this is an administrative claim
 	//administrative claims are created and maintained by players with the griefprevention.adminclaims permission.
 	public boolean isAdminClaim()
@@ -87,17 +81,6 @@ public class Claim
 	Claim()
 	{
 		this.modifiedDate = Calendar.getInstance().getTime();
-	}
-	
-	//players may only siege someone when he's not in an admin claim 
-	//and when he has some level of permission in the claim
-	public boolean canSiege(Player defender)
-	{
-		if(this.isAdminClaim()) return false;
-		
-		if(this.allowAccess(defender) != null) return false;
-		
-		return true;
 	}
 	
 	//main constructor.  note that only creating a claim instance does nothing - a claim must be added to the data store to be effective
@@ -202,18 +185,6 @@ public class Claim
 			if(player.hasPermission("griefprevention.deleteclaims")) return null;
 		}
 		
-		//no resizing, deleting, and so forth while under siege
-		if(this.ownerName.equals(player.getName()))
-		{
-			if(this.siegeData != null)
-			{
-				return "Claims can't be modified while under siege.";
-			}
-			
-			//otherwise, owners can do whatever
-			return null;
-		}
-		
 		//permission inheritance for subdivisions
 		if(this.parent != null)
 			return this.parent.allowBuild(player);
@@ -228,26 +199,10 @@ public class Claim
 		//if we don't know who's asking, always say no (i've been told some mods can make this happen somehow)
 		if(player == null) return "";
 		
-		//when a player tries to build in a claim, if he's under siege, the siege may extend to include the new claim
-		GriefPrevention.instance.dataStore.tryExtendSiege(player, this);
-		
 		//admin claims can always be modified by admins, no exceptions
 		if(this.isAdminClaim())
 		{
 			if(player.hasPermission("griefprevention.adminclaims")) return null;
-		}
-		
-		//no building while under siege
-		if(this.siegeData != null)
-		{
-			return "This claim is under siege by " + this.siegeData.attacker.getName() + ".  No one can build here.";
-		}
-		
-		//no building while in pvp combat
-		PlayerData playerData = GriefPrevention.instance.dataStore.getPlayerData(player.getName());
-		if(playerData.inPvpCombat())
-		{
-			return "You can't build in claims during PvP combat.";			
 		}
 		
 		//owners can make changes, or admins with ignore claims mode enabled
@@ -275,38 +230,7 @@ public class Claim
 		//if we don't know who's asking, always say no (i've been told some mods can make this happen somehow)
 		if(player == null) return "";
 		
-		//if under siege, some blocks will be breakable
-		if(this.siegeData != null)
-		{
-			boolean breakable = false;
-			
-			//search for block type in list of breakable blocks
-			for(int i = 0; i < GriefPrevention.instance.config_siege_blocks.size(); i++)
-			{
-				Material breakableMaterial = GriefPrevention.instance.config_siege_blocks.get(i);
-				if(breakableMaterial.getId() == material.getId())
-				{
-					breakable = true;
-					break;
-				}
-			}
-			
-			//custom error messages for siege mode
-			if(!breakable)
-			{
-				return "That material is too tough to break.";
-			}
-			else if(this.ownerName.equals(player.getName()))
-			{
-				return "You can't make changes while under siege.";
-			}
-			else
-			{
-				return null;
-			}
-		}
-		
-		//if not under siege, build rules apply
+		//build rules apply
 		return this.allowBuild(player);		
 	}
 	
@@ -318,9 +242,6 @@ public class Claim
 		
 		//everyone always has access to admin claims
 		if(this.isAdminClaim()) return null;
-		
-		//following a siege where the defender lost, the claim will allow everyone access for a time
-		if(this.doorsOpen) return null;
 		
 		//claim owner and admins in ignoreclaims mode have access
 		if(this.ownerName.equals(player.getName()) || GriefPrevention.instance.dataStore.getPlayerData(player.getName()).ignoreClaims) return null;
@@ -346,15 +267,6 @@ public class Claim
 	{		
 		//if we don't know who's asking, always say no (i've been told some mods can make this happen somehow)
 		if(player == null) return "";
-		
-		//trying to access inventory in a claim may extend an existing siege to include this claim
-		GriefPrevention.instance.dataStore.tryExtendSiege(player, this);
-		
-		//if under siege, nobody accesses containers
-		if(this.siegeData != null)
-		{
-			return "This claim is under siege by " + siegeData.attacker.getName() + ".  No one can access containers here right now.";
-		}
 		
 		//containers are always accessible in admin claims
 		if(this.isAdminClaim()) return null;

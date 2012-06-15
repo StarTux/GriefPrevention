@@ -156,24 +156,6 @@ class EntityEventHandler implements Listener
 			event.setDroppedExp(0);
 			event.getDrops().clear();			
 		}
-		
-		//FEATURE: when a player is involved in a siege (attacker or defender role)
-		//his death will end the siege
-		
-		if(!(entity instanceof Player)) return;  //only tracking players
-		
-		Player player = (Player)entity;
-		PlayerData playerData = this.dataStore.getPlayerData(player.getName());
-		
-		//if involved in a siege
-		if(playerData.siegeData != null)
-		{
-			//don't drop items as usual, they will be sent to the siege winner
-			event.getDrops().clear();
-			
-			//end it, with the dieing player being the loser
-			this.dataStore.endSiege(playerData.siegeData, null, player.getName(), true /*ended due to death*/);
-		}
 	}
 	
 	//when an entity picks up an item
@@ -275,51 +257,6 @@ class EntityEventHandler implements Listener
 			{
 				attacker = (Player)potion.getShooter();
 			}
-		}
-		
-		//if the attacker is a player and defender is a player (pvp combat)
-		if(attacker != null && event.getEntity() instanceof Player)
-		{
-			//if pvp is disabled, cancel the event
-			if(!event.getEntity().getWorld().getPVP())
-			{
-				event.setCancelled(true);
-				return;
-			}
-			
-			//FEATURE: prevent pvp in the first minute after spawn, and prevent pvp when one or both players have no inventory
-			
-			Player defender = (Player)(event.getEntity());
-			
-			PlayerData defenderData = this.dataStore.getPlayerData(((Player)event.getEntity()).getName());
-			PlayerData attackerData = this.dataStore.getPlayerData(attacker.getName());
-			
-			//otherwise if protecting spawning players
-			if(GriefPrevention.instance.config_pvp_protectFreshSpawns)
-			{
-				if(defenderData.pvpImmune)
-				{
-					event.setCancelled(true);
-					GriefPrevention.sendMessage(attacker, TextMode.Err, "You can't injure defenseless players.");
-					return;
-				}
-				
-				if(attackerData.pvpImmune)
-				{
-					event.setCancelled(true);
-					GriefPrevention.sendMessage(attacker, TextMode.Err, "You can't fight someone while you're protected from PvP.");
-					return;
-				}		
-			}
-			
-			//FEATURE: prevent players who very recently participated in pvp combat from hiding inventory to protect it from looting
-			//FEATURE: prevent players who are in pvp combat from logging out to avoid being defeated
-			
-			long now = Calendar.getInstance().getTimeInMillis();
-			defenderData.lastPvpTimestamp = now;
-			defenderData.lastPvpPlayer = attacker.getName();
-			attackerData.lastPvpTimestamp = now;
-			attackerData.lastPvpPlayer = defender.getName();
 		}
 		
 		//FEATURE: protect claimed animals, boats, minecarts

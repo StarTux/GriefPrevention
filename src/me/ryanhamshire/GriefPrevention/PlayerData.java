@@ -73,22 +73,11 @@ public class PlayerData
 	//visualization
 	public Visualization currentVisualization = null;
 	
-	//anti-camping pvp protection
-	public boolean pvpImmune = false;
-	public long lastSpawn = 0;
-	
 	//ignore claims mode
 	public boolean ignoreClaims = false;
 	
 	//the last claim this player was in, that we know of
 	public Claim lastClaim = null;
-	
-	//siege
-	public SiegeData siegeData = null;
-	
-	//pvp
-	public long lastPvpTimestamp = 0;
-	public String lastPvpPlayer = "";
 	
 	//safety confirmation for deleting multi-subdivision claims
 	public boolean warnedAboutMajorDeletion = false;
@@ -102,24 +91,6 @@ public class PlayerData
 		lastYear.add(Calendar.YEAR, -1);
 		this.lastLogin = lastYear.getTime();		
 		this.lastTrappedUsage = lastYear.getTime();
-	}
-	
-	//whether or not this player is "in" pvp combat
-	public boolean inPvpCombat()
-	{
-		if(this.lastPvpTimestamp == 0) return false;
-		
-		long now = Calendar.getInstance().getTimeInMillis();
-		
-		long elapsed = now - this.lastPvpTimestamp;
-		
-		if(elapsed > GriefPrevention.instance.config_pvp_combatTimeoutSeconds * 1000) //X seconds
-		{
-			this.lastPvpTimestamp = 0;
-			return false;
-		}
-		
-		return true;
 	}
 	
 	//the number of claim blocks a player has available for claiming land

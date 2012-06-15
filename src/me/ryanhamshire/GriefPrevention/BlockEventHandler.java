@@ -60,86 +60,6 @@ public class BlockEventHandler implements Listener
 		this.dataStore = dataStore;
 	}
 	
-	//when a block is damaged...
-	@EventHandler(ignoreCancelled = true)
-	public void onBlockDamaged(BlockDamageEvent event)
-	{
-		//if placing items in protected chests isn't enabled, none of this code needs to run
-		if(!GriefPrevention.instance.config_addItemsToClaimedChests) return;
-		
-		Block block = event.getBlock();
-		Player player = event.getPlayer(); 
-		
-		//only care about player-damaged blocks
-		if(player == null) return;
-		
-		//FEATURE: players may add items to a chest they don't have permission for by hitting it
-		
-		//if it's a chest
-		if(block.getType() == Material.CHEST)
-		{
-			//only care about non-creative mode players, since those would outright break the box in one hit
-			if(player.getGameMode() == GameMode.CREATIVE) return;
-			
-			//only care if the player has an itemstack in hand
-			PlayerInventory playerInventory = player.getInventory();
-			ItemStack stackInHand = playerInventory.getItemInHand();
-			if(stackInHand == null || stackInHand.getType() == Material.AIR) return;
-			
-			//only care if the chest is in a claim, and the player does not have access to the chest
-			Claim claim = this.dataStore.getClaimAt(block.getLocation(), false, null);
-			if(claim == null || claim.allowContainers(player) == null) return;
-			
-			//if the player is under siege, he can't give away items
-			PlayerData playerData = this.dataStore.getPlayerData(event.getPlayer().getName());
-			if(playerData.siegeData != null)
-			{
-				GriefPrevention.sendMessage(player, TextMode.Err, "You can't give away items while involved in a siege.");
-				event.setCancelled(true);
-				return;
-			}
-			
-			//NOTE: to eliminate accidental give-aways, first hit on a chest displays a confirmation message
-			//subsequent hits donate item to the chest
-			
-			//if first time damaging this chest, show confirmation message
-			if(playerData.lastChestDamageLocation == null || !block.getLocation().equals(playerData.lastChestDamageLocation))
-			{
-				//remember this location
-				playerData.lastChestDamageLocation = block.getLocation();
-				
-				//give the player instructions
-				GriefPrevention.sendMessage(player, TextMode.Instr, "To give away the item(s) in your hand, left-click the chest again.");
-			}
-			
-			//otherwise, try to donate the item stack in hand
-			else
-			{
-				//look for empty slot in chest
-				Chest chest = (Chest)block.getState();
-				Inventory chestInventory = chest.getInventory();
-				int availableSlot = chestInventory.firstEmpty();
-				
-				//if there isn't one
-				if(availableSlot < 0)
-				{
-					//tell the player and stop here
-					GriefPrevention.sendMessage(player, TextMode.Err, "This chest is full.");
-					
-					return;
-				}
-				
-				//otherwise, transfer item stack from player to chest
-				//NOTE: Inventory.addItem() is smart enough to add items to existing stacks, making filling a chest with garbage as a grief very difficult
-				chestInventory.addItem(stackInHand);
-				playerInventory.setItemInHand(new ItemStack(Material.AIR));
-				
-				//and confirm for the player
-				GriefPrevention.sendMessage(player, TextMode.Success, "Item(s) transferred to chest!");
-			}
-		}
-	}
-	
 	//when a player breaks a block...
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
 	public void onBlockBreak(BlockBreakEvent breakEvent)
@@ -185,39 +105,6 @@ public class BlockEventHandler implements Listener
 	{
 		Player player = placeEvent.getPlayer();
 		Block block = placeEvent.getBlock();
-		
-		//FEATURE: limit fire placement, to prevent PvP-by-fire
-		
-		//if placed block is fire and pvp is off, apply rules for proximity to other players 
-		if(block.getType() == Material.FIRE && !block.getWorld().getPVP() && !player.hasPermission("griefprevention.lava"))
-		{
-			List<Player> players = block.getWorld().getPlayers();
-			for(int i = 0; i < players.size(); i++)
-			{
-				Player otherPlayer = players.get(i);
-				Location location = otherPlayer.getLocation();
-				if(!otherPlayer.equals(player) && location.distanceSquared(block.getLocation()) < 9)
-				{
-					GriefPrevention.sendMessage(player, TextMode.Err, "You can't start a fire this close to " + otherPlayer.getName() + ".");
-					placeEvent.setCancelled(true);
-					return;
-				}					
-			}
-		}
-		
-		// //FEATURE: limit tree planting to grass, and dirt with more earth beneath it
-		// if(block.getType() == Material.SAPLING)
-		// {
-		// 	Block earthBlock = placeEvent.getBlockAgainst();
-		// 	if(earthBlock.getType() != Material.GRASS)
-		// 	{
-		// 		if(earthBlock.getRelative(BlockFace.DOWN).getType() == Material.AIR || 
-		// 		   earthBlock.getRelative(BlockFace.DOWN).getRelative(BlockFace.DOWN).getType() == Material.AIR)
-		// 		{
-		// 			placeEvent.setCancelled(true);
-		// 		}
-		// 	}
-		// }
 		
 		//make sure the player is allowed to build at the location
 		String noBuildReason = GriefPrevention.instance.allowBuild(player, block.getLocation());

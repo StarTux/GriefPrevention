@@ -1,20 +1,20 @@
 /*
-    GriefPrevention Server Plugin for Minecraft
-    Copyright (C) 2011 Ryan Hamshire
+  GriefPrevention Server Plugin for Minecraft
+  Copyright (C) 2011 Ryan Hamshire
 
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation, either version 3 of the License, or
+  (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+  You should have received a copy of the GNU General Public License
+  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
 package me.ryanhamshire.GriefPrevention;
 import java.util.ArrayList;
@@ -117,15 +117,6 @@ class PlayerEventHandler implements Listener
 		return false;
 	}
 
-	//when a player spawns, conditionally apply temporary pvp protection 
-	@EventHandler(ignoreCancelled = true)
-	void onPlayerRespawn (PlayerRespawnEvent event)
-	{
-		PlayerData playerData = GriefPrevention.instance.dataStore.getPlayerData(event.getPlayer().getName());
-		playerData.lastSpawn = Calendar.getInstance().getTimeInMillis();
-		GriefPrevention.instance.checkPvpProtectionNeeded(event.getPlayer());
-	}
-	
 	//when a player successfully joins the server...
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
 	void onPlayerJoin(PlayerJoinEvent event)
@@ -134,12 +125,8 @@ class PlayerEventHandler implements Listener
 		
 		//note login time
 		PlayerData playerData = this.dataStore.getPlayerData(playerName);
-		playerData.lastSpawn = Calendar.getInstance().getTimeInMillis();
 		playerData.lastLogin = new Date();
 		this.dataStore.savePlayerData(playerName, playerData);
-		
-		//check inventory, may need pvp protection
-		GriefPrevention.instance.checkPvpProtectionNeeded(event.getPlayer());
 	}
 	
 	//when a player quits...
@@ -158,20 +145,6 @@ class PlayerEventHandler implements Listener
 		String playerName = player.getName();
 		PlayerData playerData = this.dataStore.getPlayerData(playerName);
 		
-		//FEATURE: players in pvp combat when they log out will die
-		if(GriefPrevention.instance.config_pvp_punishLogout && playerData.inPvpCombat())
-		{
-			player.setHealth(0);
-		}
-		
-		//FEATURE: during a siege, any player who logs out dies and forfeits the siege
-		
-		//if player was involved in a siege, he forfeits
-		if(playerData.siegeData != null)
-		{
-			if(player.getHealth() > 0) player.setHealth(0);  //might already be zero from above, this avoids a double death message
-		}
-		
 		//remember logout time
 		playerData.lastLogout = Calendar.getInstance().getTimeInMillis();
 	}
@@ -181,59 +154,9 @@ class PlayerEventHandler implements Listener
 	public void onPlayerDropItem(PlayerDropItemEvent event)
 	{
 		Player player = event.getPlayer();
-		
 		//in creative worlds, dropping items is blocked
 		if(GriefPrevention.instance.creativeRulesApply(player.getLocation()))
 		{
-			event.setCancelled(true);
-			return;
-		}
-		
-		PlayerData playerData = this.dataStore.getPlayerData(player.getName());
-		
-		//FEATURE: players under siege or in PvP combat, can't throw items on the ground to hide 
-		//them or give them away to other players before they are defeated
-		
-		//if in combat, don't let him drop it
-		if(!GriefPrevention.instance.config_pvp_allowCombatItemDrop && playerData.inPvpCombat())
-		{
-			GriefPrevention.sendMessage(player, TextMode.Err, "You can't drop items while in PvP combat.");
-			event.setCancelled(true);			
-		}
-		
-		//if he's under siege, don't let him drop it
-		else if(playerData.siegeData != null)
-		{
-			GriefPrevention.sendMessage(player, TextMode.Err, "You can't drop items while involved in a siege.");
-			event.setCancelled(true);
-		}
-	}
-	
-	//when a player teleports
-	@EventHandler(priority = EventPriority.LOWEST)
-	public void onPlayerTeleport(PlayerTeleportEvent event)
-	{
-		//FEATURE: prevent teleport abuse to win sieges
-		
-		//these rules only apply to non-ender-pearl teleportation
-		if(event.getCause() == TeleportCause.ENDER_PEARL) return;
-		
-		Player player = event.getPlayer();
-		
-		Location source = event.getFrom();
-		Claim sourceClaim = this.dataStore.getClaimAt(source, false, null);
-		if(sourceClaim != null && sourceClaim.siegeData != null)
-		{
-			GriefPrevention.sendMessage(player, TextMode.Err, "You can't teleport out of a besieged area.");
-			event.setCancelled(true);
-			return;
-		}
-		
-		Location destination = event.getTo();
-		Claim destinationClaim = this.dataStore.getClaimAt(destination, false, null);
-		if(destinationClaim != null && destinationClaim.siegeData != null)
-		{
-			GriefPrevention.sendMessage(player, TextMode.Err, "You can't teleport into a besieged area.");
 			event.setCancelled(true);
 			return;
 		}
@@ -245,25 +168,6 @@ class PlayerEventHandler implements Listener
 	{
 		Player player = event.getPlayer();
 		Entity entity = event.getRightClicked();
-		
-		//don't allow container access during pvp combat
-		PlayerData playerData = this.dataStore.getPlayerData(player.getName());
-		if((entity instanceof StorageMinecart || entity instanceof PoweredMinecart))
-		{
-			if(playerData.siegeData != null)
-			{
-				GriefPrevention.sendMessage(player, TextMode.Err, "You can't access containers while under siege.");
-				event.setCancelled(true);
-				return;
-			}
-			
-			if(playerData.inPvpCombat())
-			{
-				GriefPrevention.sendMessage(player, TextMode.Err, "You can't access containers during PvP combat.");
-				event.setCancelled(true);
-				return;
-			}			
-		}
 		
 		//if the entity is a vehicle and we're preventing theft in claims		
 		if(GriefPrevention.instance.config_claims_preventTheft && entity instanceof Vehicle)
@@ -304,37 +208,6 @@ class PlayerEventHandler implements Listener
 					}
 				}
 			}
-		}
-	}
-	
-	//when a player picks up an item...
-	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
-	public void onPlayerPickupItem(PlayerPickupItemEvent event)
-	{
-		Player player = event.getPlayer();
-		
-		if(!event.getPlayer().getWorld().getPVP()) return;
-		
-		//if we're preventing spawn camping and the player was previously empty handed...
-		if(GriefPrevention.instance.config_pvp_protectFreshSpawns && (player.getItemInHand().getType() == Material.AIR))
-		{
-			//if that player is currently immune to pvp
-			PlayerData playerData = this.dataStore.getPlayerData(event.getPlayer().getName());
-			if(playerData.pvpImmune)
-			{
-				//if it's been less than 10 seconds since the last time he spawned, don't pick up the item
-				long now = Calendar.getInstance().getTimeInMillis();
-				long elapsedSinceLastSpawn = now - playerData.lastSpawn;
-				if(elapsedSinceLastSpawn < 10000)
-				{
-					event.setCancelled(true);
-					return;
-				}
-				
-				//otherwise take away his immunity. he may be armed now.  at least, he's worth killing for some loot
-				playerData.pvpImmune = false;
-				GriefPrevention.sendMessage(player, TextMode.Warn, "Now you can fight with other players.");
-			}			
 		}
 	}
 	
@@ -409,26 +282,6 @@ class PlayerEventHandler implements Listener
 				return;
 			}			
 		}
-		
-		//lava buckets can't be dumped near other players unless pvp is on
-		if(!block.getWorld().getPVP() && !player.hasPermission("griefprevention.lava"))
-		{
-			if(bucketEvent.getBucket() == Material.LAVA_BUCKET)
-			{
-				List<Player> players = block.getWorld().getPlayers();
-				for(int i = 0; i < players.size(); i++)
-				{
-					Player otherPlayer = players.get(i);
-					Location location = otherPlayer.getLocation();
-					if(!otherPlayer.equals(player) && block.getY() >= location.getBlockY() - 1 && location.distanceSquared(block.getLocation()) < minLavaDistance * minLavaDistance)
-					{
-						GriefPrevention.sendMessage(player, TextMode.Err, "You can't place lava this close to " + otherPlayer.getName() + ".");
-						bucketEvent.setCancelled(true);
-						return;
-					}					
-				}
-			}
-		}
 	}
 	
 	//see above
@@ -496,30 +349,13 @@ class PlayerEventHandler implements Listener
 		
 		//otherwise apply rules for containers and crafting blocks
 		else if(	GriefPrevention.instance.config_claims_preventTheft && (
-						event.getAction() == Action.RIGHT_CLICK_BLOCK && (
+                                        event.getAction() == Action.RIGHT_CLICK_BLOCK && (
 						clickedBlock.getState() instanceof InventoryHolder || 
 						clickedBlockType == Material.BREWING_STAND || 
 						clickedBlockType == Material.WORKBENCH || 
 						clickedBlockType == Material.JUKEBOX || 
 						clickedBlockType == Material.ENCHANTMENT_TABLE)))
 		{			
-			//block container use while under siege, so players can't hide items from attackers
-			PlayerData playerData = this.dataStore.getPlayerData(player.getName());
-			if(playerData.siegeData != null)
-			{
-				GriefPrevention.sendMessage(player, TextMode.Err, "You can't access containers while involved in a siege.");
-				event.setCancelled(true);
-				return;
-			}
-			
-			//block container use during pvp combat, same reason
-			if(playerData.inPvpCombat())
-			{
-				GriefPrevention.sendMessage(player, TextMode.Err, "You can't access containers during PvP combat.");
-				event.setCancelled(true);
-				return;
-			}
-			
 			//otherwise check permissions for the claim the player is in
 			Claim claim = this.dataStore.getClaimAt(clickedBlock.getLocation(), false, null);
 			if(claim != null)
@@ -530,14 +366,6 @@ class PlayerEventHandler implements Listener
 					event.setCancelled(true);
 					GriefPrevention.sendMessage(player, TextMode.Err, noContainersReason);
 				}
-			}
-			
-			//if the event hasn't been cancelled, then the player is allowed to use the container
-			//so drop any pvp protection
-			if(playerData.pvpImmune)
-			{
-				playerData.pvpImmune = false;
-				GriefPrevention.sendMessage(player, TextMode.Warn, "Now you can fight with other players.");
 			}
 		}
 		
@@ -635,14 +463,6 @@ class PlayerEventHandler implements Listener
 			else if(materialInHand != Material.GOLD_SPADE) return;
 			
 			PlayerData playerData = this.dataStore.getPlayerData(player.getName());
-			
-			//disable golden shovel while under siege
-			if(playerData.siegeData != null)
-			{
-				GriefPrevention.sendMessage(player, TextMode.Err, "You can't use your shovel tool while involved in a siege.");
-				event.setCancelled(true);
-				return;
-			}
 			
 			//can't use the shovel from too far away
 			if(clickedBlockType == Material.AIR)
@@ -912,9 +732,9 @@ class PlayerEventHandler implements Listener
 				{				
 					//temporary claim instance, just for checking contains()
 					Claim newClaim = new Claim(
-							new Location(oldClaim.getLesserBoundaryCorner().getWorld(), newx1, newy1, newz1), 
-							new Location(oldClaim.getLesserBoundaryCorner().getWorld(), newx2, newy2, newz2),
-							"", new String[]{}, new String[]{}, new String[]{}, new String[]{});
+                                                new Location(oldClaim.getLesserBoundaryCorner().getWorld(), newx1, newy1, newz1), 
+                                                new Location(oldClaim.getLesserBoundaryCorner().getWorld(), newx2, newy2, newz2),
+                                                "", new String[]{}, new String[]{}, new String[]{}, new String[]{});
 					
 					//if the new claim is smaller
 					if(!newClaim.contains(oldClaim.getLesserBoundaryCorner(), true, false) || !newClaim.contains(oldClaim.getGreaterBoundaryCorner(), true, false))
@@ -1014,12 +834,12 @@ class PlayerEventHandler implements Listener
 							
 							//try to create a new claim (will return null if this subdivision overlaps another)
 							CreateClaimResult result = this.dataStore.createClaim(
-									player.getWorld(), 
-									playerData.lastShovelLocation.getBlockX(), clickedBlock.getX(), 
-									playerData.lastShovelLocation.getBlockY() - GriefPrevention.instance.config_claims_claimsExtendIntoGroundDistance, clickedBlock.getY() - GriefPrevention.instance.config_claims_claimsExtendIntoGroundDistance, 
-									playerData.lastShovelLocation.getBlockZ(), clickedBlock.getZ(), 
-									"--subdivision--",  //owner name is not used for subdivisions
-									playerData.claimSubdividing);
+                                                                player.getWorld(), 
+                                                                playerData.lastShovelLocation.getBlockX(), clickedBlock.getX(), 
+                                                                playerData.lastShovelLocation.getBlockY() - GriefPrevention.instance.config_claims_claimsExtendIntoGroundDistance, clickedBlock.getY() - GriefPrevention.instance.config_claims_claimsExtendIntoGroundDistance, 
+                                                                playerData.lastShovelLocation.getBlockZ(), clickedBlock.getZ(), 
+                                                                "--subdivision--",  //owner name is not used for subdivisions
+                                                                playerData.claimSubdividing);
 							
 							//if it didn't succeed, tell the player why
 							if(!result.succeeded)
@@ -1123,12 +943,12 @@ class PlayerEventHandler implements Listener
 				
 				//try to create a new claim (will return null if this claim overlaps another)
 				CreateClaimResult result = this.dataStore.createClaim(
-						player.getWorld(), 
-						lastShovelLocation.getBlockX(), clickedBlock.getX(), 
-						lastShovelLocation.getBlockY() - GriefPrevention.instance.config_claims_claimsExtendIntoGroundDistance, clickedBlock.getY() - GriefPrevention.instance.config_claims_claimsExtendIntoGroundDistance, 
-						lastShovelLocation.getBlockZ(), clickedBlock.getZ(), 
-						playerName,
-						null);
+                                        player.getWorld(), 
+                                        lastShovelLocation.getBlockX(), clickedBlock.getX(), 
+                                        lastShovelLocation.getBlockY() - GriefPrevention.instance.config_claims_claimsExtendIntoGroundDistance, clickedBlock.getY() - GriefPrevention.instance.config_claims_claimsExtendIntoGroundDistance, 
+                                        lastShovelLocation.getBlockZ(), clickedBlock.getZ(), 
+                                        playerName,
+                                        null);
 				
 				//if it didn't succeed, tell the player why
 				if(!result.succeeded)

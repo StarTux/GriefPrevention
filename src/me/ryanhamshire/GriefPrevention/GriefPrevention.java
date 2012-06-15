@@ -78,14 +78,6 @@ public class GriefPrevention extends JavaPlugin
 	
 	public int config_claims_trappedCooldownHours;					//number of hours between uses of the /trapped command
 	
-	public ArrayList<World> config_siege_enabledWorlds;				//whether or not /siege is enabled on this server
-	public ArrayList<Material> config_siege_blocks;					//which blocks will be breakable in siege mode
-		
-	public boolean config_pvp_protectFreshSpawns;					//whether to make newly spawned players immune until they pick up an item
-	public boolean config_pvp_punishLogout;						    //whether to kill players who log out during PvP combat
-	public int config_pvp_combatTimeoutSeconds;						//how long combat is considered to continue after the most recent damage
-	public boolean config_pvp_allowCombatItemDrop;					//whether a player can drop items during combat to hide them
-	
 	public boolean config_trees_removeFloatingTreetops;				//whether to automatically remove partially cut trees
 	public boolean config_trees_regrowGriefedTrees;					//whether to automatically replant partially cut trees
 	
@@ -206,11 +198,6 @@ public class GriefPrevention extends JavaPlugin
 		this.config_claims_expirationDays = config.getInt("GriefPrevention.Claims.IdleLimitDays", 0);
 		this.config_claims_trappedCooldownHours = config.getInt("GriefPrevention.Claims.TrappedCommandCooldownHours", 8);
 		
-		this.config_pvp_protectFreshSpawns = config.getBoolean("GriefPrevention.PvP.ProtectFreshSpawns", true);
-		this.config_pvp_punishLogout = config.getBoolean("GriefPrevention.PvP.PunishLogout", true);
-		this.config_pvp_combatTimeoutSeconds = config.getInt("GriefPrevention.PvP.CombatTimeoutSeconds", 15);
-		this.config_pvp_allowCombatItemDrop = config.getBoolean("GriefPrevention.PvP.AllowCombatItemDrop", false);
-		
 		this.config_trees_removeFloatingTreetops = config.getBoolean("GriefPrevention.Trees.RemoveFloatingTreetops", true);
 		this.config_trees_regrowGriefedTrees = config.getBoolean("GriefPrevention.Trees.RegrowGriefedTrees", true);
 		
@@ -224,78 +211,6 @@ public class GriefPrevention extends JavaPlugin
 		
 		this.config_addItemsToClaimedChests = config.getBoolean("GriefPrevention.AddItemsToClaimedChests", true);
 		this.config_eavesdrop = config.getBoolean("GriefPrevention.EavesdropEnabled", false);
-		
-		//default for siege worlds list
-		ArrayList<String> defaultSiegeWorldNames = new ArrayList<String>();
-		
-		//get siege world names from the config file
-		List<String> siegeEnabledWorldNames = config.getStringList("GriefPrevention.Siege.Worlds");
-		if(siegeEnabledWorldNames == null)
-		{			
-			siegeEnabledWorldNames = defaultSiegeWorldNames;
-		}
-		
-		//validate that list
-		this.config_siege_enabledWorlds = new ArrayList<World>();
-		for(int i = 0; i < siegeEnabledWorldNames.size(); i++)
-		{
-			String worldName = siegeEnabledWorldNames.get(i);
-			World world = this.getServer().getWorld(worldName);
-			if(world == null)
-			{
-				AddLogEntry("Error: Siege Configuration: There's no world named \"" + worldName + "\".  Please update your config.yml.");
-			}
-			else
-			{
-				this.config_siege_enabledWorlds.add(world);
-			}
-		}
-		
-		//default siege blocks
-		this.config_siege_blocks = new ArrayList<Material>();
-		this.config_siege_blocks.add(Material.DIRT);
-		this.config_siege_blocks.add(Material.GRASS);
-		this.config_siege_blocks.add(Material.LONG_GRASS);
-		this.config_siege_blocks.add(Material.COBBLESTONE);
-		this.config_siege_blocks.add(Material.GRAVEL);
-		this.config_siege_blocks.add(Material.SAND);
-		this.config_siege_blocks.add(Material.GLASS);
-		this.config_siege_blocks.add(Material.THIN_GLASS);
-		this.config_siege_blocks.add(Material.WOOD);
-		this.config_siege_blocks.add(Material.WOOL);
-		this.config_siege_blocks.add(Material.SNOW);
-		
-		//build a default config entry
-		ArrayList<String> defaultBreakableBlocksList = new ArrayList<String>();
-		for(int i = 0; i < this.config_siege_blocks.size(); i++)
-		{
-			defaultBreakableBlocksList.add(this.config_siege_blocks.get(i).name());
-		}
-		
-		//try to load the list from the config file
-		List<String> breakableBlocksList = config.getStringList("GriefPrevention.Siege.BreakableBlocks");
-		
-		//if it fails, use default list instead
-		if(breakableBlocksList == null || breakableBlocksList.size() == 0)
-		{
-			breakableBlocksList = defaultBreakableBlocksList;
-		}
-		
-		//parse the list of siege-breakable blocks
-		this.config_siege_blocks = new ArrayList<Material>();
-		for(int i = 0; i < breakableBlocksList.size(); i++)
-		{
-			String blockName = breakableBlocksList.get(i);
-			Material material = Material.getMaterial(blockName);
-			if(material == null)
-			{
-				GriefPrevention.AddLogEntry("Siege Configuration: Material not found: " + blockName + ".");
-			}
-			else
-			{
-				this.config_siege_blocks.add(material);
-			}
-		}
 		
 		config.set("GriefPrevention.Claims.Worlds", claimsEnabledWorldNames);
 		config.set("GriefPrevention.Claims.CreativeRulesWorlds", creativeClaimsEnabledWorldNames);
@@ -312,11 +227,6 @@ public class GriefPrevention extends JavaPlugin
 		config.set("GriefPrevention.Claims.IdleLimitDays", this.config_claims_expirationDays);
 		config.set("GriefPrevention.Claims.TrappedCommandCooldownHours", this.config_claims_trappedCooldownHours);
 		
-		config.set("GriefPrevention.PvP.ProtectFreshSpawns", this.config_pvp_protectFreshSpawns);
-		config.set("GriefPrevention.PvP.PunishLogout", this.config_pvp_punishLogout);
-		config.set("GriefPrevention.PvP.CombatTimeoutSeconds", this.config_pvp_combatTimeoutSeconds);
-		config.set("GriefPrevention.PvP.AllowCombatItemDrop", this.config_pvp_allowCombatItemDrop);
-		
 		config.set("GriefPrevention.Trees.RemoveFloatingTreetops", this.config_trees_removeFloatingTreetops);
 		config.set("GriefPrevention.Trees.RegrowGriefedTrees", this.config_trees_regrowGriefedTrees);
 		
@@ -331,9 +241,6 @@ public class GriefPrevention extends JavaPlugin
 		config.set("GriefPrevention.AddItemsToClaimedChests", this.config_addItemsToClaimedChests);
 		config.set("GriefPrevention.EavesdropEnabled", this.config_eavesdrop);
 		
-		config.set("GriefPrevention.Siege.Worlds", siegeEnabledWorldNames);
-		config.set("GriefPrevention.Siege.BreakableBlocks", breakableBlocksList);
-
 		try
 		{
 			config.save(DataStore.configFilePath);
@@ -1151,118 +1058,6 @@ public class GriefPrevention extends JavaPlugin
 			return true;
 		}
 		
-		//siege
-		else if(cmd.getName().equalsIgnoreCase("siege") && player != null)
-		{
-			//error message for when siege mode is disabled
-			if(!this.siegeEnabledForWorld(player.getWorld()))
-			{
-				GriefPrevention.sendMessage(player, TextMode.Err, "Siege is disabled here.");
-				return true;
-			}
-			
-			//requires one argument
-			if(args.length > 1)
-			{
-				return false;
-			}
-			
-			//can't start a siege when you're already involved in one
-			Player attacker = player;
-			PlayerData attackerData = this.dataStore.getPlayerData(attacker.getName());
-			if(attackerData.siegeData != null)
-			{
-				GriefPrevention.sendMessage(player, TextMode.Err, "You're already involved in a siege.");
-				return true;
-			}
-			
-			//if a player name was specified, use that
-			Player defender = null;
-			if(args.length >= 1)
-			{
-				defender = this.getServer().getPlayer(args[0]);
-				if(defender == null)
-				{
-					GriefPrevention.sendMessage(player, TextMode.Err, "Player not found.");
-					return true;
-				}
-			}
-			
-			//otherwise use the last player this player was in pvp combat with 
-			else if(attackerData.lastPvpPlayer.length() > 0)
-			{
-				defender = this.getServer().getPlayer(attackerData.lastPvpPlayer);
-				if(defender == null)
-				{
-					return false;
-				}
-			}
-			
-			else
-			{
-				return false;
-			}
-			
-			//victim must not be under siege already
-			PlayerData defenderData = this.dataStore.getPlayerData(defender.getName());
-			if(defenderData.siegeData != null)
-			{
-				GriefPrevention.sendMessage(player, TextMode.Err, defender.getName() + " is already under siege.  Join the party!");
-				return true;
-			}
-			
-			//victim must not be pvp immune
-			if(defenderData.pvpImmune)
-			{
-				GriefPrevention.sendMessage(player, TextMode.Err, defender.getName() + " is defenseless.  Go pick on somebody else.");
-				return true;
-			}
-			
-			Claim defenderClaim = this.dataStore.getClaimAt(defender.getLocation(), false, null);
-			
-			//defender must have some level of permission there to be protected
-			if(defenderClaim == null || defenderClaim.allowAccess(defender) != null)
-			{
-				GriefPrevention.sendMessage(player, TextMode.Err, defender.getName() + " isn't protected there.");
-				return true;
-			}									
-			
-			//attacker must be close to the claim he wants to siege
-			if(!defenderClaim.isNear(attacker.getLocation(), 25))
-			{
-				GriefPrevention.sendMessage(player, TextMode.Err, "You're too far away from " + defender.getName() + " to siege.");
-				return true;
-			}
-			
-			//claim can't be under siege already
-			if(defenderClaim.siegeData != null)
-			{
-				GriefPrevention.sendMessage(player, TextMode.Err, "That area is already under siege.  Join the party!");
-				return true;
-			}
-			
-			//can't siege admin claims
-			if(defenderClaim.isAdminClaim())
-			{
-				GriefPrevention.sendMessage(player, TextMode.Err, "Siege is disabled in this area.");
-				return true;
-			}
-			
-			//can't be on cooldown
-			if(dataStore.onCooldown(attacker, defender, defenderClaim))
-			{
-				GriefPrevention.sendMessage(player, TextMode.Err, "You're still on siege cooldown for this defender or claim.  Find another victim.");
-				return true;
-			}
-			
-			//start the siege
-			dataStore.startSiege(attacker, defender, defenderClaim);			
-
-			//confirmation message for attacker, warning message for defender
-			GriefPrevention.sendMessage(defender, TextMode.Warn, "You're under siege!  If you log out now, you will die.  You must defeat " + attacker.getName() + ", wait for him to give up, or escape.");
-			GriefPrevention.sendMessage(player, TextMode.Success, "The siege has begun!  If you log out now, you will die.  You must defeat " + defender.getName() + ", chase him away, or admit defeat and walk away.");			
-		}
-		
 		return false; 
 	}
 	
@@ -1481,52 +1276,12 @@ public class GriefPrevention extends JavaPlugin
 		AddLogEntry("GriefPrevention disabled.");
 	}
 	
-	//called when a player spawns, applies protection for that player if necessary
-	public void checkPvpProtectionNeeded(Player player)
-	{
-		//if pvp is disabled, do nothing
-		if(!player.getWorld().getPVP()) return;
-		
-		//if anti spawn camping feature is not enabled, do nothing
-		if(!this.config_pvp_protectFreshSpawns) return;
-		
-		//check inventory for well, anything
-		PlayerInventory inventory = player.getInventory();
-		ItemStack [] armorStacks = inventory.getArmorContents();
-		
-		//check armor slots, stop if any items are found
-		for(int i = 0; i < armorStacks.length; i++)
-		{
-			if(!(armorStacks[i] == null || armorStacks[i].getType() == Material.AIR)) return;
-		}
-		
-		//check other slots, stop if any items are found
-		ItemStack [] generalStacks = inventory.getContents();
-		for(int i = 0; i < generalStacks.length; i++)
-		{
-			if(!(generalStacks[i] == null || generalStacks[i].getType() == Material.AIR)) return;
-		}
-			
-		//otherwise, apply immunity
-		PlayerData playerData = this.dataStore.getPlayerData(player.getName());
-		playerData.pvpImmune = true;
-		
-		//inform the player
-		GriefPrevention.sendMessage(player, TextMode.Success, "You're protected from attack by other players as long as your inventory is empty.");
-	}
-	
 	//checks whether players can create claims in a world
 	public boolean claimsEnabledForWorld(World world)
 	{
 		return this.config_claims_enabledWorlds.contains(world);
 	}
 	
-	//checks whether players siege in a world
-	public boolean siegeEnabledForWorld(World world)
-	{
-		return this.config_siege_enabledWorlds.contains(world);
-	}
-
 	//processes broken log blocks to automatically remove floating treetops
 	void handleLogBroken(Block block) 
 	{
