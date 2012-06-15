@@ -52,12 +52,6 @@ public class PlayerData
 	//the claim this player is currently subdividing
 	public Claim claimSubdividing = null;
 	
-	//the timestamp for the last time the player used /trapped
-	public Date lastTrappedUsage;
-	
-	//whether or not the player has a pending /trapped rescue
-	public boolean pendingTrapped = false;
-	
 	//last place the player damaged a chest
 	public Location lastChestDamageLocation = null;
 	
@@ -87,7 +81,6 @@ public class PlayerData
 		Calendar lastYear = Calendar.getInstance();
 		lastYear.add(Calendar.YEAR, -1);
 		this.lastLogin = lastYear.getTime();		
-		this.lastTrappedUsage = lastYear.getTime();
 	}
 	
 	//the number of claim blocks a player has available for claiming land
