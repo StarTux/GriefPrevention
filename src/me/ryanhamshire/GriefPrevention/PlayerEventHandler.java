@@ -232,7 +232,6 @@ class PlayerEventHandler implements Listener
 	{
 		Player player = bucketEvent.getPlayer();
 		Block block = bucketEvent.getBlockClicked().getRelative(bucketEvent.getBlockFace());
-		int minLavaDistance = 10;
 		
 		//make sure the player is allowed to build at the location
 		String noBuildReason = GriefPrevention.instance.allowBuild(player, block.getLocation());
@@ -241,24 +240,6 @@ class PlayerEventHandler implements Listener
 			GriefPrevention.sendMessage(player, TextMode.Err, noBuildReason);
 			bucketEvent.setCancelled(true);
 			return;
-		}
-		
-		//if the bucket is being used in a claim, allow for dumping lava closer to other players
-		Claim claim = this.dataStore.getClaimAt(block.getLocation(), false, null);
-		if(claim != null)
-		{
-			minLavaDistance = 3;			
-		}
-		
-		//otherwise no dumping anything unless underground
-		else
-		{
-			if(block.getY() >= block.getWorld().getSeaLevel() - 5 && !player.hasPermission("griefprevention.lava"))
-			{
-				GriefPrevention.sendMessage(player, TextMode.Err, "You may only dump buckets inside your claim(s) or underground.");
-				bucketEvent.setCancelled(true);
-				return;
-			}			
 		}
 	}
 	
