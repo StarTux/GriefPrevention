@@ -304,9 +304,23 @@ class PlayerEventHandler implements Listener
 				}
 			}
                 }
+
+                //deny changing noteblocks in claims without build rights
+                if (clickedBlockType == Material.NOTE_BLOCK && event.getAction() == Action.RIGHT_CLICK_BLOCK) {
+			Claim claim = this.dataStore.getClaimAt(clickedBlock.getLocation(), false, null);
+			if(claim != null)
+			{
+				String noBuildReason = claim.allowBuild(player);
+				if(noBuildReason != null)
+				{
+					event.setCancelled(true);
+					GriefPrevention.sendMessage(player, TextMode.Err, noBuildReason);
+				}
+			}
+                }
 		
 		//apply rules for buttons and switches
-		if(GriefPrevention.instance.config_claims_preventButtonsSwitches && (clickedBlockType == null || clickedBlockType == Material.STONE_BUTTON || clickedBlockType == Material.LEVER))
+		if (GriefPrevention.instance.config_claims_preventButtonsSwitches && (clickedBlockType == null || clickedBlockType == Material.STONE_BUTTON || clickedBlockType == Material.LEVER))
 		{
 			Claim claim = this.dataStore.getClaimAt(clickedBlock.getLocation(), false, null);
 			if(claim != null)
