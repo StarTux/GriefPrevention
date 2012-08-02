@@ -6,7 +6,7 @@
   it under the terms of the GNU General Public License as published by
   the Free Software Foundation, either version 3 of the License, or
   (at your option) any later version.
-
+n
   This program is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -27,22 +27,25 @@ import org.bukkit.World.Environment;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Animals;
 import org.bukkit.entity.Arrow;
+import org.bukkit.entity.Creeper;
 import org.bukkit.entity.Enderman;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.ThrownPotion;
 import org.bukkit.entity.Vehicle;
-
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
+import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.event.entity.EntityExplodeEvent;
+import org.bukkit.event.entity.EntityTargetEvent;
 import org.bukkit.event.entity.ItemSpawnEvent;
 import org.bukkit.event.painting.PaintingBreakByEntityEvent;
 import org.bukkit.event.painting.PaintingBreakEvent;
@@ -195,4 +198,33 @@ class EntityEventHandler implements Listener
 			}
 		}
 	}
+
+        @EventHandler(priority = EventPriority.LOWEST)
+        public void onEntityTarget(EntityTargetEvent event) {
+                if (event.isCancelled()) return;
+                if (event.getEntity().getType() == EntityType.CREEPER && event.getTarget() != null) {
+                        Creeper creeper = (Creeper)event.getEntity();
+                        if (event.getTarget() instanceof LivingEntity) {
+                                creeper.setTarget((LivingEntity)event.getTarget());
+                        }
+                }
+        }
+
+        @EventHandler
+        public void onEntityExplode(EntityExplodeEvent event) {
+                if (event.isCancelled()) return;
+                Entity entity = event.getEntity();
+                Claim claim = this.dataStore.getClaimAt(entity.getLocation(), true, null);
+
+                // Deny creeper explosions unless target can build
+                if (entity.getType() == EntityType.CREEPER && claim != null) {
+                        Creeper creeper = (Creeper)entity;
+                        LivingEntity target = creeper.getTarget();
+                        if (target == null || !(target instanceof Player)) {
+                                event.blockList().clear();
+                        } else if (claim.allowBuild((Player)target) != null) {
+                                event.blockList().clear();
+                        }
+                }
+        }
 }
