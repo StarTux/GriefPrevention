@@ -80,9 +80,6 @@ public class GriefPrevention extends JavaPlugin
 	public double config_economy_claimBlocksPurchaseCost;			//cost to purchase a claim block.  set to zero to disable purchase.
 	public double config_economy_claimBlocksSellValue;				//return on a sold claim block.  set to zero to disable sale.
 	
-	public boolean config_fireSpreads;								//whether fire spreads outside of claims
-	public boolean config_fireDestroys;								//whether fire destroys blocks outside of claims
-	
 	//reference to the economy plugin, if economy integration is enabled
 	public static Economy economy = null;					
 	
@@ -188,9 +185,6 @@ public class GriefPrevention extends JavaPlugin
 		this.config_economy_claimBlocksPurchaseCost = config.getDouble("GriefPrevention.Economy.ClaimBlocksPurchaseCost", 0);
 		this.config_economy_claimBlocksSellValue = config.getDouble("GriefPrevention.Economy.ClaimBlocksSellValue", 0);
 		
-		this.config_fireSpreads = config.getBoolean("GriefPrevention.FireSpreads", false);
-		this.config_fireDestroys = config.getBoolean("GriefPrevention.FireDestroys", false);
-		
 		config.set("GriefPrevention.Claims.Worlds", claimsEnabledWorldNames);
 		config.set("GriefPrevention.Claims.CreativeRulesWorlds", creativeClaimsEnabledWorldNames);
 		config.set("GriefPrevention.Claims.PreventTheft", this.config_claims_preventTheft);
@@ -207,9 +201,6 @@ public class GriefPrevention extends JavaPlugin
 		
 		config.set("GriefPrevention.Economy.ClaimBlocksPurchaseCost", this.config_economy_claimBlocksPurchaseCost);
 		config.set("GriefPrevention.Economy.ClaimBlocksSellValue", this.config_economy_claimBlocksSellValue);
-		
-		config.set("GriefPrevention.FireSpreads", this.config_fireSpreads);
-		config.set("GriefPrevention.FireDestroys", this.config_fireDestroys);
 		
 		try
 		{

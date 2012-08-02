@@ -236,34 +236,33 @@ public class BlockEventHandler implements Listener
 		}		
 	}
 	
-	//blocks are ignited ONLY by flint and steel (not by being near lava, open flames, etc), unless configured otherwise
 	@EventHandler(priority = EventPriority.LOWEST)
-	public void onBlockIgnite (BlockIgniteEvent igniteEvent)
+	public void onBlockIgnite (BlockIgniteEvent event)
 	{
-		if(igniteEvent.getCause() != IgniteCause.FLINT_AND_STEEL  && !GriefPrevention.instance.config_fireSpreads) igniteEvent.setCancelled(true);
+                // Deny usage of flint and steel or fireballs without build permission
+                if (event.getCause() == BlockIgniteEvent.IgniteCause.FIREBALL || event.getCause() == BlockIgniteEvent.IgniteCause.FLINT_AND_STEEL) {
+                        Player player = event.getPlayer();
+                        if (player != null) {
+                                String noBuildReason = GriefPrevention.instance.allowBuild(player, event.getBlock().getLocation());
+                                if (noBuildReason != null) {
+                                        GriefPrevention.sendMessage(player, TextMode.Err, noBuildReason);
+                                        event.setCancelled(true);
+                                }
+                        }
+                }
 	}
 	
-	//fire doesn't spread unless configured to, but other blocks still do (mushrooms and vines, for example)
 	@EventHandler(priority = EventPriority.LOWEST)
-	public void onBlockSpread (BlockSpreadEvent spreadEvent)
+	public void onBlockSpread (BlockSpreadEvent event)
 	{
-		if(spreadEvent.getSource().getType() == Material.FIRE && !GriefPrevention.instance.config_fireSpreads) spreadEvent.setCancelled(true);
-	}
-	
-	//blocks are not destroyed by fire, unless configured to do so
-	@EventHandler(priority = EventPriority.LOWEST)
-	public void onBlockBurn (BlockBurnEvent burnEvent)
-	{
-		if(!GriefPrevention.instance.config_fireDestroys)
-		{
-			burnEvent.setCancelled(true);
-		}
-		
-		//never burn claimed blocks, regardless of settings
-		if(this.dataStore.getClaimAt(burnEvent.getBlock().getLocation(), false, null) != null)
-		{
-			burnEvent.setCancelled(true);
-		}
+                Claim claim = dataStore.getClaimAt(event.getBlock().getLocation(), false, null);
+                // Deny fire spread into claims
+                if (claim != null) {
+                        Claim sourceClaim = dataStore.getClaimAt(event.getSource().getLocation(), false, null);
+                        if (claim != sourceClaim) {
+                                event.setCancelled(true);
+                        }
+                }
 	}
 	
 	//ensures fluids don't flow out of claims, unless into another claim where the owner is trusted to build
