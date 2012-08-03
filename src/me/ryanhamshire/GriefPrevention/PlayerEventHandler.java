@@ -356,11 +356,13 @@ class PlayerEventHandler implements Listener
 			}
 		}
 		
-		//apply rule for players trampling tilled soil back to dirt (never allow it)
+		// apply rule for players trampling tilled soil back to dirt (works only with build permission)
 		//NOTE: that this event applies only to players.  monsters and animals can still trample.
 		else if(event.getAction() == Action.PHYSICAL && clickedBlockType == Material.SOIL)
 		{
-			event.setCancelled(true);
+                        if (GriefPrevention.instance.allowBuild(player, clickedBlock.getLocation()) != null) {
+                                event.setCancelled(true);
+                        }
 		}
 		
 		//otherwise handle right click (shovel, string, bonemeal)
