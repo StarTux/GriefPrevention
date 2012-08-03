@@ -415,7 +415,7 @@ class PlayerEventHandler implements Listener
 			}
 			
 			//if it's a string, he's investigating a claim			
-			else if(materialInHand == Material.STRING)
+			else if(materialInHand == Material.STICK)
 			{
 				//air indicates too far away
 				if(clickedBlockType == Material.AIR)
