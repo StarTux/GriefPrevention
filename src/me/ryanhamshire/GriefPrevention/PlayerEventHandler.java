@@ -302,16 +302,12 @@ class PlayerEventHandler implements Listener
 
                 //deny ignition of TNT with flint and steel without build rights
                 if (clickedBlockType == Material.TNT && event.getAction() == Action.RIGHT_CLICK_BLOCK && player.getItemInHand().getType() == Material.FLINT_AND_STEEL) {
-			Claim claim = this.dataStore.getClaimAt(clickedBlock.getLocation(), false, null);
-			if(claim != null)
-			{
-				String noBuildReason = claim.allowBuild(player);
-				if(noBuildReason != null)
-				{
-					event.setCancelled(true);
-					GriefPrevention.sendMessage(player, TextMode.Err, noBuildReason);
-				}
-			}
+                        String noBuildReason = GriefPrevention.instance.allowBuild(player, clickedBlock.getLocation());
+                        if(noBuildReason != null)
+                        {
+                                event.setCancelled(true);
+                                GriefPrevention.sendMessage(player, TextMode.Err, noBuildReason);
+                        }
                 }
 
                 //deny changing noteblocks in claims without build rights
