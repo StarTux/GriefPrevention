@@ -248,7 +248,7 @@ class PlayerEventHandler implements Listener
                 if (bucketEvent.getBucket() == Material.LAVA_BUCKET && claim == null && !playerData.ignoreClaims) {
                         // The absence of a claim is enough because we already
                         // know that the player has build perms
-                        GriefPrevention.sendMessage(player, TextMode.Err, "You cannot place that outside your own claim");
+                        GriefPrevention.sendMessage(player, TextMode.Err, "You cannot place that outside your own claim.");
                         bucketEvent.setCancelled(true);
                         return;
                 }
