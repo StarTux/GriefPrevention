@@ -249,7 +249,7 @@ public class BlockEventHandler implements Listener
                         if (player != null) {
                                 PlayerData playerData = GriefPrevention.instance.dataStore.getPlayerData(player.getName());
                                 Claim claim = dataStore.getClaimAt(event.getBlock().getLocation(), true, playerData.lastClaim);
-                                if (claim == null) {
+                                if (claim == null && !playerData.ignoreClaims) {
                                         GriefPrevention.sendMessage(player, TextMode.Err, "You cannot do that outside your own claims.");
                                         event.setCancelled(true);
                                         return;

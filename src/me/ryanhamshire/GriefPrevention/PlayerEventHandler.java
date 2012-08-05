@@ -243,7 +243,9 @@ class PlayerEventHandler implements Listener
 		}
 
                 // deny placement of lava outside a claim with build permissions
-                if (bucketEvent.getBucket() == Material.LAVA_BUCKET && dataStore.getClaimAt(block.getLocation(), false, null) == null) {
+                Claim claim = dataStore.getClaimAt(block.getLocation(), false, null);
+                PlayerData playerData = dataStore.getPlayerData(player.getName());
+                if (bucketEvent.getBucket() == Material.LAVA_BUCKET && claim == null && !playerData.ignoreClaims) {
                         // The absence of a claim is enough because we already
                         // know that the player has build perms
                         GriefPrevention.sendMessage(player, TextMode.Err, "You cannot place that outside your own claim");
