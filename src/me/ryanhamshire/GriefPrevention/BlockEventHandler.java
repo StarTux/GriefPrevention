@@ -243,14 +243,23 @@ public class BlockEventHandler implements Listener
                 if (event.getCause() == BlockIgniteEvent.IgniteCause.FIREBALL || event.getCause() == BlockIgniteEvent.IgniteCause.FLINT_AND_STEEL) {
                         Player player = event.getPlayer();
                         if (player != null) {
-                                String noBuildReason = GriefPrevention.instance.allowBuild(player, event.getBlock().getLocation());
-                                if (noBuildReason != null) {
-                                        GriefPrevention.sendMessage(player, TextMode.Err, noBuildReason);
+                                PlayerData playerData = GriefPrevention.instance.dataStore.getPlayerData(player.getName());
+                                Claim claim = dataStore.getClaimAt(event.getBlock().getLocation(), true, playerData.lastClaim);
+                                if (claim == null) {
+                                        GriefPrevention.sendMessage(player, TextMode.Err, "You cannot do that outside your own claims.");
                                         event.setCancelled(true);
+                                        return;
+                                } else {
+                                        String noBuildReason = claim.allowBuild(player);
+                                        if (noBuildReason != null) {
+                                                GriefPrevention.sendMessage(player, TextMode.Err, noBuildReason);
+                                                event.setCancelled(true);
+                                                return;
+                                        }
                                 }
                         }
                 }
-	}
+        }
 	
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void onBlockSpread (BlockSpreadEvent event)
