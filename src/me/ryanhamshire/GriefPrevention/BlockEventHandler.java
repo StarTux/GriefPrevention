@@ -253,7 +253,7 @@ public class BlockEventHandler implements Listener
                                         GriefPrevention.sendMessage(player, TextMode.Err, "You cannot do that outside your own claims.");
                                         event.setCancelled(true);
                                         return;
-                                } else {
+                                } else if (claim != null) {
                                         String noBuildReason = claim.allowBuild(player);
                                         if (noBuildReason != null) {
                                                 GriefPrevention.sendMessage(player, TextMode.Err, noBuildReason);
