@@ -264,12 +264,14 @@ public class BlockEventHandler implements Listener
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void onBlockSpread (BlockSpreadEvent event)
 	{
-                Claim claim = dataStore.getClaimAt(event.getBlock().getLocation(), false, null);
-                // Deny fire spread into claims
-                if (claim != null) {
-                        Claim sourceClaim = dataStore.getClaimAt(event.getSource().getLocation(), false, null);
-                        if (claim != sourceClaim) {
+                // Deny fire spread into or out of claims.
+                Claim claim = dataStore.getClaimAt(event.getBlock().getLocation(), true, null);
+                Claim sourceClaim = dataStore.getClaimAt(event.getSource().getLocation(), true, claim);
+                if (claim != sourceClaim) {
+                        // If both blocks are within different claims of the same owner, do nothing.
+                        if (!(claim != null && sourceClaim != null && claim.getOwnerName().equalsIgnoreCase(sourceClaim.getOwnerName()))) {
                                 event.setCancelled(true);
+                                return;
                         }
                 }
 	}
