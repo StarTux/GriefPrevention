@@ -239,8 +239,17 @@ class PlayerEventHandler implements Listener
 		{
 			GriefPrevention.sendMessage(player, TextMode.Err, noBuildReason);
 			bucketEvent.setCancelled(true);
-			return;
+                        return;
 		}
+
+                // deny placement of lava outside a claim with build permissions
+                if (bucketEvent.getBucket() == Material.LAVA_BUCKET && dataStore.getClaimAt(block.getLocation(), false, null) == null) {
+                        // The absence of a claim is enough because we already
+                        // know that the player has build perms
+                        GriefPrevention.sendMessage(player, TextMode.Err, "You cannot place that outside your own claim");
+                        bucketEvent.setCancelled(true);
+                        return;
+                }
 	}
 	
 	//see above
