@@ -1,20 +1,20 @@
 /*
-    GriefPrevention Server Plugin for Minecraft
-    Copyright (C) 2012 Ryan Hamshire
+  GriefPrevention Server Plugin for Minecraft
+  Copyright (C) 2012 Ryan Hamshire
 
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation, either version 3 of the License, or
+  (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+  You should have received a copy of the GNU General Public License
+  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
 package me.ryanhamshire.GriefPrevention;
 
@@ -118,12 +118,10 @@ public class BlockEventHandler implements Listener
 				//extend the claim downward
 				this.dataStore.extendClaim(claim, claim.getLesserBoundaryCorner().getBlockY() - GriefPrevention.instance.config_claims_claimsExtendIntoGroundDistance);
 			}
-		}
+                        //FEATURE: automatically create a claim when a player who has no claims places a chest
 		
-		//FEATURE: automatically create a claim when a player who has no claims places a chest
-		
-		//otherwise if there's no claim, the player is placing a chest, and new player automatic claims are enabled
-		else if(block.getType() == Material.CHEST && GriefPrevention.instance.config_claims_automaticClaimsForNewPlayersRadius > -1 && GriefPrevention.instance.claimsEnabledForWorld(block.getWorld()))
+                        //otherwise if there's no claim, the player is placing a chest, and new player automatic claims are enabled
+		} else if(block.getType() == Material.CHEST && GriefPrevention.instance.config_claims_automaticClaimsForNewPlayersRadius > -1 && GriefPrevention.instance.claimsEnabledForWorld(block.getWorld()))
 		{			
 			//if the chest is too deep underground, don't create the claim and explain why
 			if(GriefPrevention.instance.config_claims_preventTheft && block.getY() < GriefPrevention.instance.config_claims_maxDepth)
@@ -150,11 +148,11 @@ public class BlockEventHandler implements Listener
 					//as long as the automatic claim overlaps another existing claim, shrink it
 					//note that since the player had permission to place the chest, at the very least, the automatic claim will include the chest
 					while(radius >= 0 && !this.dataStore.createClaim(block.getWorld(), 
-							block.getX() - radius, block.getX() + radius, 
-							block.getY() - GriefPrevention.instance.config_claims_claimsExtendIntoGroundDistance, block.getY(), 
-							block.getZ() - radius, block.getZ() + radius, 
-							player.getName(), 
-							null).succeeded)
+                                                                                         block.getX() - radius, block.getX() + radius, 
+                                                                                         block.getY() - GriefPrevention.instance.config_claims_claimsExtendIntoGroundDistance, block.getY(), 
+                                                                                         block.getZ() - radius, block.getZ() + radius, 
+                                                                                         player.getName(), 
+                                                                                         null).succeeded)
 					{
 						radius--;
 					}
@@ -183,7 +181,13 @@ public class BlockEventHandler implements Listener
 			{
 				GriefPrevention.sendMessage(player, TextMode.Warn, "This chest is NOT protected.  Consider expanding an existing claim or creating a new one.");				
 			}
-		}
+                } else if (block.getType() == Material.TNT && !playerData.ignoreClaims) {
+                        // Deny TNT placement outside claim with trust
+                        GriefPrevention.sendMessage(player, TextMode.Err, "You cannot place TNT outside of your own claims.");
+                        placeEvent.setCancelled(true);
+                        return;
+                }
+		
 	}
 	
 	//blocks "pushing" other players' blocks around (pistons)
