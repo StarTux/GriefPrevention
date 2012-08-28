@@ -63,7 +63,7 @@ class PlayerEventHandler implements Listener
 	}
 	
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
-	void onPlayerChat (PlayerChatEvent event)
+	void onPlayerChat (AsyncPlayerChatEvent event)
 	{		
 		Player player = event.getPlayer();
 		String message = event.getMessage();
