@@ -67,6 +67,9 @@ commands:
       description: Sells your claim blocks for server money.  Doesn't work on servers without a Vault-compatible economy plugin.
       usage: /SellClaimBlocks <numberOfBlocks>
       aliases: sellclaim
+   trapped:
+      description: Ejects you to nearby unclaimed land.  Usable once per 8 hours.
+      usage: /Trapped
    trustlist:
       description: Lists permissions for the claim you're standing in.
       usage: /TrustList

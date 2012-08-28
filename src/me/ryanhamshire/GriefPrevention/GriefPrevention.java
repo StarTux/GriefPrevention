@@ -77,6 +77,8 @@ public class GriefPrevention extends JavaPlugin
 	public int config_claims_claimsExtendIntoGroundDistance;		//how far below the shoveled block a new claim will reach
 	public int config_claims_minSize;								//minimum width and height for non-admin claims
 	
+	public int config_claims_trappedCooldownHours;					//number of hours between uses of the /trapped command
+	
 	public double config_economy_claimBlocksPurchaseCost;			//cost to purchase a claim block.  set to zero to disable purchase.
 	public double config_economy_claimBlocksSellValue;				//return on a sold claim block.  set to zero to disable sale.
 	
@@ -181,6 +183,7 @@ public class GriefPrevention extends JavaPlugin
 		this.config_claims_minSize = config.getInt("GriefPrevention.Claims.MinimumSize", 10);
 		this.config_claims_maxDepth = config.getInt("GriefPrevention.Claims.MaximumDepth", 0);
 		this.config_claims_expirationDays = config.getInt("GriefPrevention.Claims.IdleLimitDays", 0);
+		this.config_claims_trappedCooldownHours = config.getInt("GriefPrevention.Claims.TrappedCommandCooldownHours", 8);
 		
 		this.config_economy_claimBlocksPurchaseCost = config.getDouble("GriefPrevention.Economy.ClaimBlocksPurchaseCost", 0);
 		this.config_economy_claimBlocksSellValue = config.getDouble("GriefPrevention.Economy.ClaimBlocksSellValue", 0);
@@ -198,6 +201,7 @@ public class GriefPrevention extends JavaPlugin
 		config.set("GriefPrevention.Claims.MinimumSize", this.config_claims_minSize);
 		config.set("GriefPrevention.Claims.MaximumDepth", this.config_claims_maxDepth);
 		config.set("GriefPrevention.Claims.IdleLimitDays", this.config_claims_expirationDays);
+		config.set("GriefPrevention.Claims.TrappedCommandCooldownHours", this.config_claims_trappedCooldownHours);
 		
 		config.set("GriefPrevention.Economy.ClaimBlocksPurchaseCost", this.config_economy_claimBlocksPurchaseCost);
 		config.set("GriefPrevention.Economy.ClaimBlocksSellValue", this.config_economy_claimBlocksSellValue);
@@ -932,6 +936,47 @@ public class GriefPrevention extends JavaPlugin
 			GriefPrevention.AddLogEntry(sender.getName() + " adjusted " + targetPlayer.getName() + "'s bonus claim blocks by " + adjustment + ".");
 			
 			return true;			
+		}
+		
+		//trapped
+		else if(cmd.getName().equalsIgnoreCase("trapped") && player != null)
+		{
+			//FEATURE: empower players who get "stuck" in an area where they don't have permission to build to save themselves
+			
+			PlayerData playerData = this.dataStore.getPlayerData(player.getName());
+			Claim claim = this.dataStore.getClaimAt(player.getLocation(), false, playerData.lastClaim);
+			
+			//if another /trapped is pending, ignore this slash command
+			if(playerData.pendingTrapped)
+			{
+				return true;
+			}
+			
+			//if the player isn't in a claim or has permission to build, tell him to man up
+			if(claim == null || claim.allowBuild(player) == null)
+			{
+				GriefPrevention.sendMessage(player, TextMode.Err, "You can build here.  Save yourself.");				
+				return true;
+			}
+			
+			//check cooldown
+			long lastTrappedUsage = playerData.lastTrappedUsage.getTime();
+			long nextTrappedUsage = lastTrappedUsage + 1000 * 60 * 60 * this.config_claims_trappedCooldownHours; 
+			long now = Calendar.getInstance().getTimeInMillis();
+			if(now < nextTrappedUsage)
+			{
+				GriefPrevention.sendMessage(player, TextMode.Err, "You used /trapped within the last " + this.config_claims_trappedCooldownHours + " hours.  You have to wait about " + ((nextTrappedUsage - now) / (1000 * 60) + 1) + " more minutes before using it again.");
+				return true;
+			}
+			
+			//send instructions
+			GriefPrevention.sendMessage(player, TextMode.Instr, "If you stay put for 10 seconds, you'll be teleported out.  Please wait.");
+			
+			//create a task to rescue this player in a little while
+			PlayerRescueTask task = new PlayerRescueTask(player, player.getLocation());
+			this.getServer().getScheduler().scheduleSyncDelayedTask(this, task, 200L);  //20L ~ 1 second
+			
+			return true;
 		}
 		
 		return false; 

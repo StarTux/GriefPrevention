@@ -62,6 +62,19 @@ class PlayerEventHandler implements Listener
 		this.dataStore = dataStore;
 	}
 	
+	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
+	void onPlayerChat (PlayerChatEvent event)
+	{		
+		Player player = event.getPlayer();
+		String message = event.getMessage();
+		//FEATURE: automatically educate players about the /trapped command
+		//check for "trapped" or "stuck" to educate players about the /trapped command
+		if(message.contains("trapped") || message.contains("stuck"))
+		{
+			GriefPrevention.sendMessage(player, TextMode.Info, "Are you trapped in someone's claim?  Consider the /trapped command.");
+		}
+	}
+	
 	//if two strings are 75% identical, they're too close to follow each other in the chat
 	private boolean stringsAreSimilar(String message, String lastMessage)
 	{
