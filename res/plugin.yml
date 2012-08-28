@@ -70,6 +70,7 @@ commands:
    trapped:
       description: Ejects you to nearby unclaimed land.  Usable once per 8 hours.
       usage: /Trapped
+      aliases: [ stuck ]
    trustlist:
       description: Lists permissions for the claim you're standing in.
       usage: /TrustList
