@@ -178,15 +178,8 @@ class EntityEventHandler implements Listener
 				//if it's claimed
 				if(claim != null)
 				{
-					//if damaged by anything other than a player, cancel the event
-					if(attacker == null)
-					{
-						event.setCancelled(true);
-					}
-					
-					//otherwise the player damaging the entity must have permission
-					else
-					{		
+					//the player damaging the entity must have permission
+					if (attacker != null) {
 						String noContainersReason = claim.allowContainers(attacker);
 						if(noContainersReason != null)
 						{
