@@ -33,6 +33,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Tameable;
 import org.bukkit.entity.ThrownPotion;
 import org.bukkit.entity.Vehicle;
 import org.bukkit.event.EventHandler;
@@ -170,6 +171,11 @@ class EntityEventHandler implements Listener
 		//if theft protection is enabled
 		if(GriefPrevention.instance.config_claims_preventTheft && event instanceof EntityDamageByEntityEvent)
 		{
+                        // Any player can do with their own pets whatever they want.
+                        if (subEvent.getEntity() instanceof Tameable) {
+                                Tameable tameable = (Tameable)subEvent.getEntity();
+                                if (tameable.isTamed() && tameable.getOwner().equals(attacker)) return;
+                        }
 			//if the entity is an animal or a vehicle
 			if (subEvent.getEntity() instanceof Animals || subEvent.getEntity() instanceof Vehicle)
 			{
