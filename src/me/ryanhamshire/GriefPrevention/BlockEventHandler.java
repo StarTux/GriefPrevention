@@ -24,6 +24,7 @@ import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
@@ -36,8 +37,8 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockBurnEvent;
 import org.bukkit.event.block.BlockDamageEvent;
 import org.bukkit.event.block.BlockFromToEvent;
-import org.bukkit.event.block.BlockIgniteEvent;
 import org.bukkit.event.block.BlockIgniteEvent.IgniteCause;
+import org.bukkit.event.block.BlockIgniteEvent;
 import org.bukkit.event.block.BlockPistonExtendEvent;
 import org.bukkit.event.block.BlockPistonRetractEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
@@ -240,6 +241,43 @@ public class BlockEventHandler implements Listener
 			event.setCancelled(true);
 		}		
 	}
+
+        /**
+         * Check whether a given location could be the ignition
+         * point of a nether portal.  This is needed to
+         * exceptionally allow ignition of blocks outside your own
+         * claims if the purpose is to create a nether portal.
+         * This works only with the bottom two blocks.
+         * @param location The location
+         * @return true if a nether portal was found, false otherwise.
+         */
+        public boolean checkNetherPortal(Location location) {
+                final int[][][] locations = {{{1, -1, 0}, {2, 0, 0}, {2, 1, 0}, {2, 2, 0}, {-1, 0, 0}, {-1, 1, 0}, {-1, 2, 0}, {1, 3, 0}},
+                                       {{-1, -1, 0}, {-2, 0, 0}, {-2, 1, 0}, {-2, 2, 0}, {1, 0, 0}, {1, 1, 0}, {1, 2, 0}, {-1, 3, 0}},
+                                       {{0, -1, 1}, {0, 0, 2}, {0, 1, 2}, {0, 2, 2}, {0, 0, -1}, {0, 1, -1}, {0, 2, -1}, {0, 3, 1}},
+                                       {{0, -1, -1}, {0, 0, -2}, {0, 1, -2}, {0, 2, -2}, {0, 0, 1}, {0, 1, 1}, {0, 2, 1}, {0, 3, -1}}};
+                final int obs = Material.OBSIDIAN.getId();
+                int x = location.getBlockX();
+                int y = location.getBlockY();
+                int z = location.getBlockZ();
+                World world = location.getWorld();
+                if (world.getBlockTypeIdAt(x, y - 1, z) != obs) {
+                        return false;
+                }
+                if (world.getBlockTypeIdAt(x, y + 3, z) != obs) {
+                        return false;
+                }
+        mainLoop: for (int nPortal = 0; nPortal < 4; ++nPortal) {
+                        for (int nCoord = 0; nCoord < 8; ++nCoord) {
+                                int l[] = locations[nPortal][nCoord];
+                                if (world.getBlockTypeIdAt(x + l[0], y + l[1], z + l[2]) != obs) {
+                                        continue mainLoop;
+                                }
+                        }
+                        return true;
+                }
+                return false;
+        }
 	
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void onBlockIgnite (BlockIgniteEvent event)
@@ -251,9 +289,11 @@ public class BlockEventHandler implements Listener
                                 PlayerData playerData = GriefPrevention.instance.dataStore.getPlayerData(player.getName());
                                 Claim claim = dataStore.getClaimAt(event.getBlock().getLocation(), true, playerData.lastClaim);
                                 if (claim == null && !playerData.ignoreClaims) {
-                                        GriefPrevention.sendMessage(player, TextMode.Err, "You cannot do that outside your own claims.");
-                                        event.setCancelled(true);
-                                        return;
+                                        if (!checkNetherPortal(event.getBlock().getLocation())) {
+                                                GriefPrevention.sendMessage(player, TextMode.Err, "You cannot do that outside your own claims.");
+                                                event.setCancelled(true);
+                                                return;
+                                        }
                                 } else if (claim != null) {
                                         String noBuildReason = claim.allowBuild(player);
                                         if (noBuildReason != null) {
