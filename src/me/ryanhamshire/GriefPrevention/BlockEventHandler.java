@@ -288,6 +288,7 @@ public class BlockEventHandler implements Listener
                         if (player != null) {
                                 PlayerData playerData = GriefPrevention.instance.dataStore.getPlayerData(player.getName());
                                 Claim claim = dataStore.getClaimAt(event.getBlock().getLocation(), true, playerData.lastClaim);
+                                // Deny ignition if it player has no build permissions unless it is for a nether portal
                                 if (claim == null && !playerData.ignoreClaims) {
                                         if (!checkNetherPortal(event.getBlock().getLocation())) {
                                                 GriefPrevention.sendMessage(player, TextMode.Err, "You cannot do that outside your own claims.");
@@ -295,6 +296,8 @@ public class BlockEventHandler implements Listener
                                                 return;
                                         }
                                 } else if (claim != null) {
+                                        // if the block is above or below claim borders and is for a nether portal, we allow it. Stupid exception.
+                                        if (dataStore.getClaimAt(event.getBlock().getLocation(), false, claim) == null && checkNetherPortal(event.getBlock().getLocation())) return;
                                         String noBuildReason = claim.allowBuild(player);
                                         if (noBuildReason != null) {
                                                 GriefPrevention.sendMessage(player, TextMode.Err, noBuildReason);
