@@ -401,7 +401,16 @@ public class Claim
 		int z = location.getBlockZ();
 		
 		//main check
-		boolean inClaim = (ignoreHeight || y >= this.lesserBoundaryCorner.getBlockY()) &&
+                if (!ignoreHeight) {
+                        World.Environment env = location.getWorld().getEnvironment();
+                        if (env == World.Environment.NORMAL) {
+                                if (location.getBlockY() < 16) return false;
+                        }
+                        if (env == World.Environment.NETHER) {
+                                if (location.getBlockY() >= 112) return false;
+                        }
+                }
+		boolean inClaim = //(ignoreHeight || y >= this.lesserBoundaryCorner.getBlockY()) &&
 				x >= this.lesserBoundaryCorner.getBlockX() &&
 				x <= this.greaterBoundaryCorner.getBlockX() &&
 				z >= this.lesserBoundaryCorner.getBlockZ() &&
@@ -409,7 +418,7 @@ public class Claim
 				
 		if(!inClaim) return false;
 				
-	    //additional check for subdivisions
+                //additional check for subdivisions
 		//you're only in a subdivision when you're also in its parent claim
 		//NOTE: if a player creates subdivions then resizes the parent claim, it's possible that
 		//a subdivision can reach outside of its parent's boundaries.  so this check is important!
