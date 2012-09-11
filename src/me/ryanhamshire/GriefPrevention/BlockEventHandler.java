@@ -181,12 +181,13 @@ public class BlockEventHandler implements Listener
 			{
 				GriefPrevention.sendMessage(player, TextMode.Warn, "This chest is NOT protected.  Consider expanding an existing claim or creating a new one.");				
 			}
-                } else if (block.getType() == Material.TNT && !playerData.ignoreClaims) {
-                        // Deny TNT placement outside claim with trust
-                        GriefPrevention.sendMessage(player, TextMode.Err, "You cannot place TNT outside of your own claims.");
-                        placeEvent.setCancelled(true);
-                        return;
                 }
+                // else if (block.getType() == Material.TNT && !playerData.ignoreClaims) {
+                //         // Deny TNT placement outside claim with trust
+                //         GriefPrevention.sendMessage(player, TextMode.Err, "You cannot place TNT outside of your own claims.");
+                //         placeEvent.setCancelled(true);
+                //         return;
+                // }
 		
 	}
 	
