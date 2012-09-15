@@ -324,6 +324,9 @@ public class BlockEventHandler implements Listener
                 Block dstBlock = event.getBlock();
                 Claim dstClaim = dataStore.getClaimAt(dstBlock.getLocation(), true, null);
                 Claim srcClaim = dataStore.getClaimAt(srcBlock.getLocation(), true, dstClaim);
+                // We must not check if the sourceblock is fire
+                // since the event sometimes reports air when fire
+                // spreads.
                 if (dstClaim != srcClaim) {
                         // If both blocks are within different claims of the same owner, do nothing.
                         if (dstClaim != null && srcClaim != null && dstClaim.getOwnerName().equalsIgnoreCase(srcClaim.getOwnerName())) {
