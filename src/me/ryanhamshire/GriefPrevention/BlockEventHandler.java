@@ -313,13 +313,17 @@ public class BlockEventHandler implements Listener
 	public void onBlockSpread (BlockSpreadEvent event)
 	{
                 // Deny fire spread into or out of claims.
-                Claim claim = dataStore.getClaimAt(event.getBlock().getLocation(), true, null);
-                Claim sourceClaim = dataStore.getClaimAt(event.getSource().getLocation(), true, claim);
-                if (claim != sourceClaim) {
-                        // If both blocks are within different claims of the same owner, do nothing.
-                        if (!(claim != null && sourceClaim != null && claim.getOwnerName().equalsIgnoreCase(sourceClaim.getOwnerName()))) {
-                                event.setCancelled(true);
-                                return;
+                Block srcBlock = event.getSource();
+                Block dstBlock = event.getBlock();
+                Claim dstClaim = dataStore.getClaimAt(dstBlock.getLocation(), true, null);
+                Claim srcClaim = dataStore.getClaimAt(srcBlock.getLocation(), true, dstClaim);
+                if (srcBlock.getType() == Material.FIRE) {
+                        if (dstClaim != srcClaim) {
+                                // If both blocks are within different claims of the same owner, do nothing.
+                                if (!(dstClaim != null && srcClaim != null && dstClaim.getOwnerName().equalsIgnoreCase(srcClaim.getOwnerName()))) {
+                                        event.setCancelled(true);
+                                        return;
+                                }
                         }
                 }
 	}
