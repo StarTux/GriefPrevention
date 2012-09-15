@@ -331,6 +331,9 @@ public class BlockEventHandler implements Listener
 		//from where?
 		Block fromBlock = spreadEvent.getBlock();
 		Claim fromClaim = this.dataStore.getClaimAt(fromBlock.getLocation(), false, null);
+
+                // Ignore water; water griefing is unlikely and we don't like exploits
+                if (fromBlock.getType() == Material.STATIONARY_WATER || fromBlock.getType() == Material.WATER) return;
 		
 		//where to?
 		Block toBlock = spreadEvent.getToBlock();		
