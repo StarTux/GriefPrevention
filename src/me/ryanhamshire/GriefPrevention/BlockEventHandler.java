@@ -20,6 +20,7 @@ package me.ryanhamshire.GriefPrevention;
 
 import java.util.List;
 
+import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -308,6 +309,12 @@ public class BlockEventHandler implements Listener
                         }
                 }
         }
+
+        @EventHandler(priority = EventPriority.LOWEST)
+        public void onBlockBurn(BlockBurnEvent event) {
+                event.getBlock().setType(Material.AIR);
+                event.setCancelled(true);
+        }
 	
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void onBlockSpread (BlockSpreadEvent event)
@@ -317,16 +324,15 @@ public class BlockEventHandler implements Listener
                 Block dstBlock = event.getBlock();
                 Claim dstClaim = dataStore.getClaimAt(dstBlock.getLocation(), true, null);
                 Claim srcClaim = dataStore.getClaimAt(srcBlock.getLocation(), true, dstClaim);
-                if (srcBlock.getType() == Material.FIRE) {
-                        if (dstClaim != srcClaim) {
-                                // If both blocks are within different claims of the same owner, do nothing.
-                                if (!(dstClaim != null && srcClaim != null && dstClaim.getOwnerName().equalsIgnoreCase(srcClaim.getOwnerName()))) {
-                                        event.setCancelled(true);
-                                        return;
-                                }
+                if (dstClaim != srcClaim) {
+                        // If both blocks are within different claims of the same owner, do nothing.
+                        if (dstClaim != null && srcClaim != null && dstClaim.getOwnerName().equalsIgnoreCase(srcClaim.getOwnerName())) {
+                        } else {
+                                event.setCancelled(true);
+                                return;
                         }
                 }
-	}
+        }
 	
 	//ensures fluids don't flow out of claims, unless into another claim where the owner is trusted to build
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
