@@ -317,8 +317,9 @@ public class BlockEventHandler implements Listener
         }
 	
 	@EventHandler(priority = EventPriority.LOWEST)
-	public void onBlockSpread (BlockSpreadEvent event)
+	public void onBlockSpread(BlockSpreadEvent event)
 	{
+                if (event.getNewState().getType() != Material.FIRE) return;
                 // Deny fire spread into or out of claims.
                 Block srcBlock = event.getSource();
                 Block dstBlock = event.getBlock();
