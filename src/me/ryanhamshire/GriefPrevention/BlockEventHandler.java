@@ -283,6 +283,9 @@ public class BlockEventHandler implements Listener
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void onBlockIgnite (BlockIgniteEvent event)
 	{
+                for (Player player : Bukkit.getServer().getOnlinePlayers()) {
+                        player.sendMessage("Ignite " + spreadEvent.getBlock().getType());
+                }
                 // Deny usage of flint and steel or fireballs without build permission
                 if (event.getCause() == BlockIgniteEvent.IgniteCause.FIREBALL || event.getCause() == BlockIgniteEvent.IgniteCause.FLINT_AND_STEEL) {
                         Player player = event.getPlayer();
