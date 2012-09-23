@@ -256,7 +256,7 @@ class PlayerEventHandler implements Listener
 		}
 
                 // deny placement of lava outside a claim with build permissions
-                Claim claim = dataStore.getClaimAt(block.getLocation(), false, null);
+                Claim claim = dataStore.getClaimAt(block.getLocation(), true, null);
                 PlayerData playerData = dataStore.getPlayerData(player.getName());
                 if (bucketEvent.getBucket() == Material.LAVA_BUCKET && claim == null && !playerData.ignoreClaims) {
                         // The absence of a claim is enough because we already
