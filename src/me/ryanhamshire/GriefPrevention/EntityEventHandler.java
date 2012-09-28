@@ -46,7 +46,6 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
-import org.bukkit.event.entity.EntityTargetEvent;
 import org.bukkit.event.entity.ItemSpawnEvent;
 import org.bukkit.event.painting.PaintingBreakByEntityEvent;
 import org.bukkit.event.painting.PaintingBreakEvent;
@@ -197,17 +196,6 @@ class EntityEventHandler implements Listener
 			}
 		}
 	}
-
-        @EventHandler(priority = EventPriority.LOWEST)
-        public void onEntityTarget(EntityTargetEvent event) {
-                if (event.isCancelled()) return;
-                if (event.getEntity().getType() == EntityType.CREEPER && event.getTarget() != null) {
-                        Creeper creeper = (Creeper)event.getEntity();
-                        if (event.getTarget() instanceof LivingEntity) {
-                                creeper.setTarget((LivingEntity)event.getTarget());
-                        }
-                }
-        }
 
         @EventHandler
         public void onEntityExplode(EntityExplodeEvent event) {
