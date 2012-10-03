@@ -386,11 +386,6 @@ public class GriefPrevention extends JavaPlugin
 				GriefPrevention.sendMessage(player, TextMode.Instr, "There's no claim here.  Stand in the administrative claim you want to transfer.");
 				return true;
 			}
-			else if(!claim.isAdminClaim())
-			{
-				GriefPrevention.sendMessage(player, TextMode.Err, "Only administrative claims may be transferred to a player.");
-				return true;
-			}
 			
 			OfflinePlayer targetPlayer = this.resolvePlayer(args[0]);
 			if(targetPlayer == null)
