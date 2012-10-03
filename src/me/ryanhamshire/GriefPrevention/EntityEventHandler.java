@@ -6,7 +6,7 @@
   it under the terms of the GNU General Public License as published by
   the Free Software Foundation, either version 3 of the License, or
   (at your option) any later version.
-n
+  n
   This program is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -19,6 +19,7 @@ n
 package me.ryanhamshire.GriefPrevention;
 
 import java.util.Calendar;
+import java.util.Iterator;
 import java.util.List;
 
 import org.bukkit.Location;
@@ -200,17 +201,24 @@ class EntityEventHandler implements Listener
         @EventHandler
         public void onEntityExplode(EntityExplodeEvent event) {
                 if (event.isCancelled()) return;
-                Entity entity = event.getEntity();
-                Claim claim = this.dataStore.getClaimAt(entity.getLocation(), true, null);
 
                 // Deny creeper explosions unless target can build
-                if (entity.getType() == EntityType.CREEPER && claim != null) {
-                        Creeper creeper = (Creeper)entity;
-                        LivingEntity target = creeper.getTarget();
-                        if (target == null || !(target instanceof Player)) {
-                                event.blockList().clear();
-                        } else if (claim.allowBuild((Player)target) != null) {
-                                event.blockList().clear();
+                if (event.getEntity() instanceof Creeper) {
+                        Creeper creeper = (Creeper)event.getEntity();
+                        if (creeper.getTarget() != null & creeper.getTarget() instanceof Player) {
+                                Player player = (Player)creeper.getTarget();
+                                PlayerData playerData = this.dataStore.getPlayerData(player.getName());
+                                Claim lastClaim = playerData.lastClaim;
+                                for (Iterator<Block> iter = event.blockList().iterator(); iter.hasNext(); ) {
+                                        Block block = iter.next();
+                                        Claim claim = dataStore.getClaimAt(block.getLocation(), false, lastClaim);
+                                        if (claim != null) {
+                                                lastClaim = claim;
+                                                if (claim.allowBuild(player) != null) {
+                                                        iter.remove();
+                                                }
+                                        }
+                                }
                         }
                 }
         }
