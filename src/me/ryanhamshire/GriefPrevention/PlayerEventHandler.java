@@ -292,6 +292,7 @@ class PlayerEventHandler implements Listener
 		
 		//determine target block.  FEATURE: shovel and string can be used from a distance away
 		Block clickedBlock = null;
+                Action action = event.getAction();
 		
 		try
 		{
@@ -316,7 +317,7 @@ class PlayerEventHandler implements Listener
 		Material clickedBlockType = clickedBlock.getType();
 
                 //deny ignition of TNT with flint and steel without build rights
-                if (clickedBlockType == Material.TNT && event.getAction() == Action.RIGHT_CLICK_BLOCK && player.getItemInHand().getType() == Material.FLINT_AND_STEEL) {
+                if (clickedBlockType == Material.TNT && action == Action.RIGHT_CLICK_BLOCK && player.getItemInHand().getType() == Material.FLINT_AND_STEEL) {
                         String noBuildReason = GriefPrevention.instance.allowBuild(player, clickedBlock.getLocation());
                         if(noBuildReason != null)
                         {
@@ -326,7 +327,7 @@ class PlayerEventHandler implements Listener
                 }
 
                 //deny changing noteblocks in claims without build rights
-                if (clickedBlockType == Material.NOTE_BLOCK && event.getAction() == Action.RIGHT_CLICK_BLOCK) {
+                if (clickedBlockType == Material.NOTE_BLOCK && action == Action.RIGHT_CLICK_BLOCK) {
 			Claim claim = this.dataStore.getClaimAt(clickedBlock.getLocation(), false, null);
 			if(claim != null)
 			{
@@ -355,7 +356,7 @@ class PlayerEventHandler implements Listener
 		}
 		
 		//otherwise apply rules for containers and crafting blocks
-		else if (GriefPrevention.instance.config_claims_preventTheft && (event.getAction() == Action.RIGHT_CLICK_BLOCK && (clickedBlock.getState() instanceof InventoryHolder || clickedBlockType == Material.BREWING_STAND || clickedBlockType == Material.JUKEBOX))) {
+		else if (GriefPrevention.instance.config_claims_preventTheft && (action == Action.RIGHT_CLICK_BLOCK && (clickedBlock.getState() instanceof InventoryHolder || clickedBlockType == Material.BREWING_STAND || clickedBlockType == Material.JUKEBOX))) {
 			//otherwise check permissions for the claim the player is in
 			Claim claim = this.dataStore.getClaimAt(clickedBlock.getLocation(), false, null);
 			if(claim != null)
@@ -371,18 +372,27 @@ class PlayerEventHandler implements Listener
 		
 		// apply rule for players trampling tilled soil back to dirt (works only with build permission)
 		//NOTE: that this event applies only to players.  monsters and animals can still trample.
-		else if(event.getAction() == Action.PHYSICAL && clickedBlockType == Material.SOIL)
+		else if(action == Action.PHYSICAL && clickedBlockType == Material.SOIL)
 		{
                         if (GriefPrevention.instance.allowBuild(player, clickedBlock.getLocation()) != null) {
                                 event.setCancelled(true);
                         }
 		}
+
+                // deny punching the dragon egg without trust
+                else if (clickedBlockType == Material.DRAGON_EGG && (action == Action.LEFT_CLICK_BLOCK || action == Action.RIGHT_CLICK_BLOCK)) {
+                        String denyMessage = GriefPrevention.instance.allowBuild(player, clickedBlock.getLocation());
+                        if (denyMessage != null) {
+                                event.setCancelled(true);
+                                GriefPrevention.sendMessage(player, TextMode.Err, denyMessage);
+                                return;
+                        }
+                }
 		
 		//otherwise handle right click (shovel, string, bonemeal)
 		else
 		{
 			//ignore all actions except right-click on a block or in the air
-			Action action = event.getAction();
 			if(action != Action.RIGHT_CLICK_BLOCK && action != Action.RIGHT_CLICK_AIR) return;
 			
 			//what's the player holding?
