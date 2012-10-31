@@ -48,9 +48,9 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.ItemSpawnEvent;
-import org.bukkit.event.painting.PaintingBreakByEntityEvent;
-import org.bukkit.event.painting.PaintingBreakEvent;
-import org.bukkit.event.painting.PaintingPlaceEvent;
+import org.bukkit.event.hanging.HangingBreakByEntityEvent;
+import org.bukkit.event.hanging.HangingBreakEvent;
+import org.bukkit.event.hanging.HangingPlaceEvent;
 
 //handles events related to entities
 class EntityEventHandler implements Listener
@@ -81,20 +81,22 @@ class EntityEventHandler implements Listener
 		}
 	}
 	
-	//when a painting is broken
+	//when a Hanging is broken
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
-	public void onPaintingBreak(PaintingBreakEvent event)
+	public void onHangingBreak(HangingBreakEvent event)
         {
-                //FEATURE: claimed paintings are protected from breakage
+                System.out.println("Hanging Break");
+                //FEATURE: claimed Hangings are protected from breakage
 		
-		//only allow players to break paintings, not anything else (like water and explosions)
-		if(!(event instanceof PaintingBreakByEntityEvent))
+		//only allow players to break Hangings, not anything else (like water and explosions)
+                //TODO: Do something smarter
+		if(!(event instanceof HangingBreakByEntityEvent))
                 {
                         event.setCancelled(true);
                         return;
                 }
         
-                PaintingBreakByEntityEvent entityEvent = (PaintingBreakByEntityEvent)event;
+                HangingBreakByEntityEvent entityEvent = (HangingBreakByEntityEvent)event;
         
                 //who is removing it?
 		Entity remover = entityEvent.getRemover();
@@ -108,7 +110,7 @@ class EntityEventHandler implements Listener
 		
 		//if the player doesn't have build permission, don't allow the breakage
 		Player playerRemover = (Player)entityEvent.getRemover();
-                String noBuildReason = GriefPrevention.instance.allowBuild(playerRemover, event.getPainting().getLocation());
+                String noBuildReason = GriefPrevention.instance.allowBuild(playerRemover, event.getEntity().getLocation());
                 if(noBuildReason != null)
                 {
                         event.setCancelled(true);
@@ -116,14 +118,15 @@ class EntityEventHandler implements Listener
                 }
         }
 	
-	//when a painting is placed...
+	//when a Hanging is placed...
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
-	public void onPaintingPlace(PaintingPlaceEvent event)
+	public void onHangingPlace(HangingPlaceEvent event)
 	{
-		//FEATURE: similar to above, placing a painting requires build permission in the claim
+                System.out.println("Hanging Place");
+		//FEATURE: similar to above, placing a Hanging requires build permission in the claim
 	
 		//if the player doesn't have permission, don't allow the placement
-		String noBuildReason = GriefPrevention.instance.allowBuild(event.getPlayer(), event.getPainting().getLocation());
+		String noBuildReason = GriefPrevention.instance.allowBuild(event.getPlayer(), event.getEntity().getLocation());
                 if(noBuildReason != null)
                 {
                         event.setCancelled(true);
