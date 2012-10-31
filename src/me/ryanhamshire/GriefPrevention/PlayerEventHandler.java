@@ -356,7 +356,7 @@ class PlayerEventHandler implements Listener
 		}
 		
 		//otherwise apply rules for containers and crafting blocks
-		else if (GriefPrevention.instance.config_claims_preventTheft && (action == Action.RIGHT_CLICK_BLOCK && (clickedBlock.getState() instanceof InventoryHolder || clickedBlockType == Material.BREWING_STAND || clickedBlockType == Material.JUKEBOX))) {
+		else if (GriefPrevention.instance.config_claims_preventTheft && (action == Action.RIGHT_CLICK_BLOCK && (clickedBlock.getState() instanceof InventoryHolder || clickedBlockType == Material.BREWING_STAND || clickedBlockType == Material.JUKEBOX || clickedBlockType == Material.ANVIL || clickedBlockType ==  Material.BEACON))) {
 			//otherwise check permissions for the claim the player is in
 			Claim claim = this.dataStore.getClaimAt(clickedBlock.getLocation(), false, null);
 			if(claim != null)
