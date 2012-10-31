@@ -85,7 +85,6 @@ class EntityEventHandler implements Listener
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
 	public void onHangingBreak(HangingBreakEvent event)
         {
-                System.out.println("Hanging Break");
                 //FEATURE: claimed Hangings are protected from breakage
 		
 		//only allow players to break Hangings, not anything else (like water and explosions)
@@ -122,7 +121,6 @@ class EntityEventHandler implements Listener
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
 	public void onHangingPlace(HangingPlaceEvent event)
 	{
-                System.out.println("Hanging Place");
 		//FEATURE: similar to above, placing a Hanging requires build permission in the claim
 	
 		//if the player doesn't have permission, don't allow the placement
