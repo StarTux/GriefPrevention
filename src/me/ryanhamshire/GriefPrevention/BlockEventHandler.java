@@ -290,7 +290,7 @@ public class BlockEventHandler implements Listener
                                 PlayerData playerData = GriefPrevention.instance.dataStore.getPlayerData(player.getName());
                                 Claim claim = dataStore.getClaimAt(event.getBlock().getLocation(), true, playerData.lastClaim);
                                 // Deny ignition if it player has no build permissions unless it is for a nether portal
-                                if (claim == null && !playerData.ignoreClaims) {
+                                if (GriefPrevention.instance.config_claims_firePlacementRequiresTrust && claim == null && !playerData.ignoreClaims) {
                                         if (!checkNetherPortal(event.getBlock().getLocation())) {
                                                 GriefPrevention.sendMessage(player, TextMode.Err, "You cannot do that outside your own claims.");
                                                 event.setCancelled(true);
@@ -312,6 +312,7 @@ public class BlockEventHandler implements Listener
 
         @EventHandler(priority = EventPriority.LOWEST)
         public void onBlockBurn(BlockBurnEvent event) {
+                if (!GriefPrevention.config_claims_fireCannotCrossClaimBorders) return;
                 if (event.getBlock().getType() == Material.TNT) return;
                 event.getBlock().setType(Material.AIR);
                 event.setCancelled(true);
@@ -320,6 +321,7 @@ public class BlockEventHandler implements Listener
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void onBlockSpread(BlockSpreadEvent event)
 	{
+                if (!GriefPrevention.instance.config_claims_fireCannotCrossClaimBorders) return;
                 if (event.getNewState().getType() != Material.FIRE) return;
                 // Deny fire spread into or out of claims.
                 Block srcBlock = event.getSource();
@@ -343,6 +345,8 @@ public class BlockEventHandler implements Listener
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
 	public void onBlockFromTo (BlockFromToEvent spreadEvent)
 	{
+                if (!GriefPrevention.instance.config_claims_fireCannotCrossClaimBorders) return;
+
 		//from where?
 		Block fromBlock = spreadEvent.getBlock();
 		Claim fromClaim = this.dataStore.getClaimAt(fromBlock.getLocation(), false, null);
