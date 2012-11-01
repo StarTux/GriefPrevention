@@ -28,12 +28,14 @@ import org.bukkit.World.Environment;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Animals;
 import org.bukkit.entity.Arrow;
+import org.bukkit.entity.Creature;
 import org.bukkit.entity.Creeper;
 import org.bukkit.entity.Enderman;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
 import org.bukkit.entity.Tameable;
 import org.bukkit.entity.ThrownPotion;
 import org.bukkit.entity.Vehicle;
@@ -99,16 +101,40 @@ class EntityEventHandler implements Listener
         
                 //who is removing it?
 		Entity remover = entityEvent.getRemover();
+                Player playerRemover = null;
         
-		//again, making sure the breaker is a player
-		if(!(remover instanceof Player))
-                {
-                        event.setCancelled(true);
+                if (remover instanceof Player) {
+                        playerRemover = (Player)entityEvent.getRemover();
+                } else if (remover instanceof Creature) {
+                        LivingEntity target = ((Creature)remover).getTarget();
+                        if (target == null) {
+                                return;
+                        } else if (target instanceof Player) {
+                                playerRemover = (Player)target;
+                        } else {
+                                return;
+                        }
+                } else if (remover instanceof Projectile) {
+                        LivingEntity shooter = ((Projectile)remover).getShooter();
+                        if (shooter instanceof Player) {
+                                playerRemover = (Player)shooter;
+                        } else if (shooter instanceof Creature) {
+                                LivingEntity target = ((Creature)shooter).getTarget();
+                                if (target == null) {
+                                        return;
+                                } else if (target instanceof Player) {
+                                        playerRemover = (Player)target;
+                                } else {
+                                        return;
+                                }
+                        } else {
+                                return;
+                        }
+                } else {
                         return;
                 }
 		
 		//if the player doesn't have build permission, don't allow the breakage
-		Player playerRemover = (Player)entityEvent.getRemover();
                 String noBuildReason = GriefPrevention.instance.allowBuild(playerRemover, event.getEntity().getLocation());
                 if(noBuildReason != null)
                 {
