@@ -35,9 +35,10 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Animals;
 import org.bukkit.entity.Boat;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.ItemFrame;
+import org.bukkit.entity.Player;
 import org.bukkit.entity.PoweredMinecart;
 import org.bukkit.entity.StorageMinecart;
-import org.bukkit.entity.Player;
 import org.bukkit.entity.Vehicle;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -184,7 +185,7 @@ class PlayerEventHandler implements Listener
 					String noAccessReason = claim.allowAccess(player);
 					if(noAccessReason != null)
 					{
-						player.sendMessage(noAccessReason);
+						GriefPrevention.sendMessage(player, TextMode.Err, noAccessReason);
 						event.setCancelled(true);
 					}
 				}
@@ -200,6 +201,21 @@ class PlayerEventHandler implements Listener
 				}
 			}
 		}
+
+                if (entity instanceof ItemFrame) {
+                        ItemFrame itemFrame = (ItemFrame)entity;
+                        if (itemFrame.getItem().getType() != Material.AIR) {
+                                PlayerData playerData = dataStore.getPlayerData(player.getName());
+                                Claim claim = dataStore.getClaimAt(itemFrame.getLocation(), false, playerData.lastClaim);
+                                if (claim != null) {
+                                        String noContainerReason = claim.allowContainers(player);
+                                        if (noContainerReason != null) {
+                                                GriefPrevention.sendMessage(player, TextMode.Err, noContainerReason);
+                                                event.setCancelled(true);
+                                        }
+                                }
+                        }
+                }
 	}
 	
 	//when a player switches in-hand items
