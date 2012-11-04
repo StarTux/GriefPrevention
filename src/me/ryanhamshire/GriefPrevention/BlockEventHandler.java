@@ -312,7 +312,7 @@ public class BlockEventHandler implements Listener
 
         @EventHandler(priority = EventPriority.LOWEST)
         public void onBlockBurn(BlockBurnEvent event) {
-                if (!GriefPrevention.config_claims_fireCannotCrossClaimBorders) return;
+                if (!GriefPrevention.instance.config_claims_fireCannotCrossClaimBorders) return;
                 if (event.getBlock().getType() == Material.TNT) return;
                 event.getBlock().setType(Material.AIR);
                 event.setCancelled(true);
