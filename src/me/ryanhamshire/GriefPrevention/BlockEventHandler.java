@@ -55,6 +55,8 @@ public class BlockEventHandler implements Listener
 {
 	//convenience reference to singleton datastore
 	private DataStore dataStore;
+        //cache last claim for the FromBlockToEvent to opimize lava flow processing
+        private Claim lastBlockFromToEventClaim;
 	
 	//boring typical constructor
 	public BlockEventHandler(DataStore dataStore)
@@ -347,16 +349,16 @@ public class BlockEventHandler implements Listener
 	{
                 if (!GriefPrevention.instance.config_claims_fireCannotCrossClaimBorders) return;
 
-		//from where?
 		Block fromBlock = spreadEvent.getBlock();
-		Claim fromClaim = this.dataStore.getClaimAt(fromBlock.getLocation(), false, null);
-
                 // Ignore water; water griefing is unlikely and we don't like exploits
                 if (fromBlock.getType() == Material.STATIONARY_WATER || fromBlock.getType() == Material.WATER) return;
-		
+		Claim fromClaim = this.dataStore.getClaimAt(fromBlock.getLocation(), false, lastBlockFromToEventClaim);
+                if (fromClaim != null) lastBlockFromToEventClaim = fromClaim;
+
 		//where to?
 		Block toBlock = spreadEvent.getToBlock();		
-		Claim toClaim = this.dataStore.getClaimAt(toBlock.getLocation(), false, fromClaim);
+		Claim toClaim = this.dataStore.getClaimAt(toBlock.getLocation(), false, lastBlockFromToEventClaim);
+                if (toClaim != null) lastBlockFromToEventClaim = toClaim;
 		
 		//block any spread into the wilderness
 		if(fromClaim != null && toClaim == null)
