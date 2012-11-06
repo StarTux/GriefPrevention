@@ -89,14 +89,12 @@ class EntityEventHandler implements Listener
         {
                 //FEATURE: claimed Hangings are protected from breakage
 		
-		//only allow players to break Hangings, not anything else (like water and explosions)
-                //TODO: Do something smarter
-		if(!(event instanceof HangingBreakByEntityEvent))
-                {
+		// always block when explosions are the cause
+		if(event.getCause() == HangingBreakEvent.RemoveCause.EXPLOSION) {
                         event.setCancelled(true);
                         return;
                 }
-        
+                if (!(event instanceof HangingBreakByEntityEvent)) return;
                 HangingBreakByEntityEvent entityEvent = (HangingBreakByEntityEvent)event;
         
                 //who is removing it?
