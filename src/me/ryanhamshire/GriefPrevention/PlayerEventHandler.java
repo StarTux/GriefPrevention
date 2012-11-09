@@ -622,7 +622,7 @@ class PlayerEventHandler implements Listener
 					//if resizing someone else's claim, make a log entry
 					if(!playerData.claimResizing.ownerName.equals(playerName))
 					{
-						GriefPrevention.AddLogEntry(playerName + " resized " + playerData.claimResizing.getOwnerName() + "'s claim at " + GriefPrevention.getfriendlyLocationString(playerData.claimResizing.lesserBoundaryCorner) + ".");
+						GriefPrevention.addLogEntry(playerName + " resized " + playerData.claimResizing.getOwnerName() + "'s claim at " + GriefPrevention.getfriendlyLocationString(playerData.claimResizing.lesserBoundaryCorner) + ".");
 					}
 					
 					//clean up

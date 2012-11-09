@@ -161,7 +161,7 @@ public class DataStore
 				//if there's any problem with the file's content, log an error message and skip it
 				catch(Exception e)
 				{
-                                        GriefPrevention.AddLogEntry("Unable to load data for claim \"" + files[i].getName() + "\": " + e.getMessage());
+                                        GriefPrevention.addLogEntry("Unable to load data for claim \"" + files[i].getName() + "\": " + e.getMessage());
 				}
 				
 				try
@@ -172,7 +172,7 @@ public class DataStore
 			}
 		}
 		
-		GriefPrevention.AddLogEntry(loadedClaimCount + " total claims loaded.");
+		GriefPrevention.addLogEntry(loadedClaimCount + " total claims loaded.");
 		
 		//make a list of players who own claims
 		Vector<String> playerNames = new Vector<String>();
@@ -187,7 +187,7 @@ public class DataStore
 				playerNames.add(claim.ownerName);
 		}
 		
-		GriefPrevention.AddLogEntry(playerNames.size() + " players have staked claims.");
+		GriefPrevention.addLogEntry(playerNames.size() + " players have staked claims.");
 		
 		//load each of these players and determine whether his claims should be cleaned up
 		for(int i = 0; i < playerNames.size(); i++)
@@ -218,7 +218,7 @@ public class DataStore
 				if(claim.getArea() <= areaOfDefaultClaim)
 				{
 					this.deleteClaim(claim);
-					GriefPrevention.AddLogEntry(" " + playerName + "'s new player claim expired.");
+					GriefPrevention.addLogEntry(" " + playerName + "'s new player claim expired.");
 				}
 			}
 			
@@ -230,7 +230,7 @@ public class DataStore
 				if(earliestPermissibleLastLogin.getTime().after(playerData.lastLogin))
 				{
 					this.deleteClaimsForPlayer(playerName, true);
-					GriefPrevention.AddLogEntry(" All of " + playerName + "'s claims have expired.");
+					GriefPrevention.addLogEntry(" All of " + playerName + "'s claims have expired.");
 				}
 			}
 			
@@ -400,7 +400,7 @@ public class DataStore
 		//if any problem, log it
 		catch(Exception e)
 		{
-			GriefPrevention.AddLogEntry("PopulationDensity: Unexpected exception saving data for claim \"" + claimID + "\": " + e.getMessage());
+			GriefPrevention.addLogEntry("PopulationDensity: Unexpected exception saving data for claim \"" + claimID + "\": " + e.getMessage());
 		}
 		
 		//close the file
@@ -508,7 +508,7 @@ public class DataStore
 					}
 					catch(ParseException parseException)
 					{
-						GriefPrevention.AddLogEntry("Unable to load last login for \"" + playerFile.getName() + "\".");
+						GriefPrevention.addLogEntry("Unable to load last login for \"" + playerFile.getName() + "\".");
 						playerData.lastLogin = null;
 					}
 					
@@ -579,7 +579,7 @@ public class DataStore
 				//if there's any problem with the file's content, log an error message
 				catch(Exception e)
 				{
-                                        GriefPrevention.AddLogEntry("Unable to load data for player \"" + playerName + "\": " + e.getMessage());			 
+                                        GriefPrevention.addLogEntry("Unable to load data for player \"" + playerName + "\": " + e.getMessage());			 
 				}
 				
 				try
@@ -631,7 +631,7 @@ public class DataStore
 		File claimFile = new File(claimDataFolderPath + File.separator + claimID);
 		if(claimFile.exists() && !claimFile.delete())
 		{
-			GriefPrevention.AddLogEntry("Error: Unable to delete claim file \"" + claimFile.getAbsolutePath() + "\".");
+			GriefPrevention.addLogEntry("Error: Unable to delete claim file \"" + claimFile.getAbsolutePath() + "\".");
 		}
 		
 		//update player data, except for administrative claims, which have no owner
@@ -829,7 +829,7 @@ public class DataStore
 		//if any problem, log it
 		catch(Exception e)
 		{
-			GriefPrevention.AddLogEntry("PopulationDensity: Unexpected exception saving data for player \"" + playerName + "\": " + e.getMessage());
+			GriefPrevention.addLogEntry("PopulationDensity: Unexpected exception saving data for player \"" + playerName + "\": " + e.getMessage());
 		}
 		
 		try

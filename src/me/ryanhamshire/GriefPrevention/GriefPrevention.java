@@ -1,20 +1,20 @@
 /*
-    GriefPrevention Server Plugin for Minecraft
-    Copyright (C) 2011 Ryan Hamshire
+  GriefPrevention Server Plugin for Minecraft
+  Copyright (C) 2011 Ryan Hamshire
 
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation, either version 3 of the License, or
+  (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+  You should have received a copy of the GNU General Public License
+  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
 package me.ryanhamshire.GriefPrevention;
 
@@ -48,13 +48,9 @@ import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
-public class GriefPrevention extends JavaPlugin
-{
+public class GriefPrevention extends JavaPlugin {
 	//for convenience, a reference to the instance of this plugin
 	public static GriefPrevention instance;
-	
-	//for logging to the console and log file
-	private static Logger log = Logger.getLogger("Minecraft");
 	
 	//this handles data storage, like player and region data
 	public DataStore dataStore;
@@ -91,17 +87,16 @@ public class GriefPrevention extends JavaPlugin
 	public static final int NOTIFICATION_SECONDS = 20;
 	
 	//adds a server log entry
-	public static void AddLogEntry(String entry)
+	public static void addLogEntry(String entry)
 	{
-		log.info("GriefPrevention: " + entry);
+		GriefPrevention.instance.getLogger().info("GriefPrevention: " + entry);
 	}
 	
 	//initializes well...   everything
 	public void onEnable()
 	{ 		
-		AddLogEntry("Grief Prevention enabled.");
-		
 		instance = this;
+		addLogEntry("Grief Prevention enabled.");
 		
 		//load the config if it exists
 		FileConfiguration config = YamlConfiguration.loadConfiguration(new File(DataStore.configFilePath));
@@ -131,7 +126,7 @@ public class GriefPrevention extends JavaPlugin
 			World world = this.getServer().getWorld(worldName);
 			if(world == null)
 			{
-				AddLogEntry("Error: Claims Configuration: There's no world named \"" + worldName + "\".  Please update your config.yml.");
+				addLogEntry("Error: Claims Configuration: There's no world named \"" + worldName + "\".  Please update your config.yml.");
 			}
 			else
 			{
@@ -166,7 +161,7 @@ public class GriefPrevention extends JavaPlugin
 			World world = this.getServer().getWorld(worldName);
 			if(world == null)
 			{
-				AddLogEntry("Error: Claims Configuration: There's no world named \"" + worldName + "\".  Please update your config.yml.");
+				addLogEntry("Error: Claims Configuration: There's no world named \"" + worldName + "\".  Please update your config.yml.");
 			}
 			else
 			{
@@ -218,7 +213,7 @@ public class GriefPrevention extends JavaPlugin
 		}
 		catch(IOException exception)
 		{
-			AddLogEntry("Unable to write to the configuration file at \"" + DataStore.configFilePath + "\"");
+			addLogEntry("Unable to write to the configuration file at \"" + DataStore.configFilePath + "\"");
 		}
 		
 		//when datastore initializes, it loads player and claim data, and posts some stats to the log
@@ -248,38 +243,29 @@ public class GriefPrevention extends JavaPlugin
 		pluginManager.registerEvents(entityEventHandler, this);
 		
 		//if economy is enabled
-		if(this.config_economy_claimBlocksPurchaseCost > 0 || this.config_economy_claimBlocksSellValue > 0)
-		{
+		if(this.config_economy_claimBlocksPurchaseCost > 0 || this.config_economy_claimBlocksSellValue > 0) {
 			//try to load Vault
-			GriefPrevention.AddLogEntry("GriefPrevention requires Vault for economy integration.");
-			GriefPrevention.AddLogEntry("Attempting to load Vault...");
+			GriefPrevention.addLogEntry("GriefPrevention requires Vault for economy integration.");
+			GriefPrevention.addLogEntry("Attempting to load Vault...");
 			RegisteredServiceProvider<Economy> economyProvider = getServer().getServicesManager().getRegistration(net.milkbowl.vault.economy.Economy.class);
-			GriefPrevention.AddLogEntry("Vault loaded successfully!");
+			GriefPrevention.addLogEntry("Vault loaded successfully!");
 			
 			//ask Vault to hook into an economy plugin
-			GriefPrevention.AddLogEntry("Looking for a Vault-compatible economy plugin...");
-			if (economyProvider != null) 
-	        {
-	        	GriefPrevention.economy = economyProvider.getProvider();
+			GriefPrevention.addLogEntry("Looking for a Vault-compatible economy plugin...");
+			if (economyProvider != null) {
+                                GriefPrevention.economy = economyProvider.getProvider();
 	            
-	            //on success, display success message
-				if(GriefPrevention.economy != null)
-		        {
-	            	GriefPrevention.AddLogEntry("Hooked into economy: " + GriefPrevention.economy.getName() + ".");  
-	            	GriefPrevention.AddLogEntry("Ready to buy/sell claim blocks!");
-		        }
-		        
-				//otherwise error message
-				else
-		        {
-		        	GriefPrevention.AddLogEntry("ERROR: Vault was unable to find a supported economy plugin.  Either install a Vault-compatible economy plugin, or set both of the economy config variables to zero.");
-		        }	            
-	        }
-			
-			//another error case
-			else
-			{
-				GriefPrevention.AddLogEntry("ERROR: Vault was unable to find a supported economy plugin.  Either install a Vault-compatible economy plugin, or set both of the economy config variables to zero.");
+                                //on success, display success message
+				if(GriefPrevention.economy != null) {
+                                        GriefPrevention.addLogEntry("Hooked into economy: " + GriefPrevention.economy.getName() + ".");  
+                                        GriefPrevention.addLogEntry("Ready to buy/sell claim blocks!");
+                                } else {
+                                        //otherwise error message
+                                        GriefPrevention.addLogEntry("ERROR: Vault was unable to find a supported economy plugin.  Either install a Vault-compatible economy plugin, or set both of the economy config variables to zero.");
+                                }	            
+                        } else {
+                                //another error case
+				GriefPrevention.addLogEntry("ERROR: Vault was unable to find a supported economy plugin.  Either install a Vault-compatible economy plugin, or set both of the economy config variables to zero.");
 			}
 		}		
 	}
@@ -413,7 +399,7 @@ public class GriefPrevention extends JavaPlugin
 			
 			//confirm
 			GriefPrevention.sendMessage(player, TextMode.Success, "Claim transferred.");
-			GriefPrevention.AddLogEntry(player.getName() + " transferred a claim at " + GriefPrevention.getfriendlyLocationString(claim.getLesserBoundaryCorner()) + " to " + targetPlayer.getName() + ".");
+			GriefPrevention.addLogEntry(player.getName() + " transferred a claim at " + GriefPrevention.getfriendlyLocationString(claim.getLesserBoundaryCorner()) + " to " + targetPlayer.getName() + ".");
 			
 			return true;
 		}
@@ -841,7 +827,7 @@ public class GriefPrevention extends JavaPlugin
 					{
 						this.dataStore.deleteClaim(claim);
 						GriefPrevention.sendMessage(player, TextMode.Success, "Claim deleted.");
-						GriefPrevention.AddLogEntry(player.getName() + " deleted " + claim.getOwnerName() + "'s claim at " + GriefPrevention.getfriendlyLocationString(claim.getLesserBoundaryCorner()));
+						GriefPrevention.addLogEntry(player.getName() + " deleted " + claim.getOwnerName() + "'s claim at " + GriefPrevention.getfriendlyLocationString(claim.getLesserBoundaryCorner()));
 						
 						//revert any current visualization
 						Visualization.Revert(player);
@@ -934,7 +920,7 @@ public class GriefPrevention extends JavaPlugin
 			this.dataStore.savePlayerData(targetPlayer.getName(), playerData);
 			
 			GriefPrevention.sendMessage(sender, TextMode.Success, "Adjusted " + targetPlayer.getName() + "'s bonus claim blocks by " + adjustment + ".  New total bonus blocks: " + playerData.bonusClaimBlocks + ".");
-			GriefPrevention.AddLogEntry(sender.getName() + " adjusted " + targetPlayer.getName() + "'s bonus claim blocks by " + adjustment + ".");
+			GriefPrevention.addLogEntry(sender.getName() + " adjusted " + targetPlayer.getName() + "'s bonus claim blocks by " + adjustment + ".");
 			
 			return true;			
 		}
@@ -1093,14 +1079,14 @@ public class GriefPrevention extends JavaPlugin
 			{
 				switch(permissionLevel)
 				{
-					case Access:
-						errorMessage = claim.allowAccess(player);
-						break;
-					case Inventory:
-						errorMessage = claim.allowContainers(player);
-						break;
-					default:
-						errorMessage = claim.allowBuild(player);					
+                                case Access:
+                                        errorMessage = claim.allowAccess(player);
+                                        break;
+                                case Inventory:
+                                        errorMessage = claim.allowContainers(player);
+                                        break;
+                                default:
+                                        errorMessage = claim.allowBuild(player);					
 				}
 			}
 			
@@ -1195,7 +1181,7 @@ public class GriefPrevention extends JavaPlugin
 
 	public void onDisable()
 	{ 
-		AddLogEntry("GriefPrevention disabled.");
+		addLogEntry("GriefPrevention disabled.");
 	}
 	
 	//checks whether players can create claims in a world
