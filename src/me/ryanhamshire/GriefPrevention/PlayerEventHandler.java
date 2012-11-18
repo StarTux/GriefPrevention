@@ -40,6 +40,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.PoweredMinecart;
 import org.bukkit.entity.StorageMinecart;
 import org.bukkit.entity.Vehicle;
+import org.bukkit.entity.Villager;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -162,10 +163,11 @@ class PlayerEventHandler implements Listener
 		Entity entity = event.getRightClicked();
 		
 		//if the entity is a vehicle and we're preventing theft in claims		
-		if(GriefPrevention.instance.config_claims_preventTheft && entity instanceof Vehicle)
+		if(GriefPrevention.instance.config_claims_preventTheft)
 		{
 			//if the entity is in a claim
-			Claim claim = this.dataStore.getClaimAt(entity.getLocation(), false, null);
+                        PlayerData data = this.dataStore.getPlayerData(player.getName());
+			Claim claim = this.dataStore.getClaimAt(entity.getLocation(), false, data.lastClaim);
 			if(claim != null)
 			{
 				//for storage and powered minecarts, apply container rules (this is a potential theft)
@@ -199,6 +201,13 @@ class PlayerEventHandler implements Listener
 						event.setCancelled(true);
 					}
 				}
+                                //if the entity is a villager, apply container rules
+                                else if (entity instanceof Villager) {
+                                        if (claim.allowContainers(player) != null) {
+                                                GriefPrevention.sendMessage(player, TextMode.Err, "This villager belongs to " + claim.getOwnerName() + ".");
+                                                event.setCancelled(true);
+                                        }
+                                }
 			}
 		}
 
