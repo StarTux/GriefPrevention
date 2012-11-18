@@ -40,6 +40,7 @@ import org.bukkit.entity.Projectile;
 import org.bukkit.entity.Tameable;
 import org.bukkit.entity.ThrownPotion;
 import org.bukkit.entity.Vehicle;
+import org.bukkit.entity.Villager;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -202,9 +203,8 @@ class EntityEventHandler implements Listener
                                 Tameable tameable = (Tameable)subEvent.getEntity();
                                 if (tameable.isTamed() && tameable.getOwner().equals(attacker)) return;
                         }
-			//if the entity is an animal or golem or a vehicle
-			if (subEvent.getEntity() instanceof Animals || subEvent.getEntity() instanceof Golem || subEvent.getEntity() instanceof Vehicle)
-			{
+			//if the entity is an animal, golem, villager or a vehicle
+			if (subEvent.getEntity() instanceof Animals || subEvent.getEntity() instanceof Golem || subEvent.getEntity() instanceof Villager || subEvent.getEntity() instanceof Vehicle) {
 				Claim claim = this.dataStore.getClaimAt(event.getEntity().getLocation(), false, null);
 				
 				//if it's claimed
