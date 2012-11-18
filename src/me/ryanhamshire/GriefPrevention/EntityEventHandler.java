@@ -33,6 +33,7 @@ import org.bukkit.entity.Creeper;
 import org.bukkit.entity.Enderman;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Golem;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
@@ -201,8 +202,8 @@ class EntityEventHandler implements Listener
                                 Tameable tameable = (Tameable)subEvent.getEntity();
                                 if (tameable.isTamed() && tameable.getOwner().equals(attacker)) return;
                         }
-			//if the entity is an animal or a vehicle
-			if (subEvent.getEntity() instanceof Animals || subEvent.getEntity() instanceof Vehicle)
+			//if the entity is an animal or golem or a vehicle
+			if (subEvent.getEntity() instanceof Animals || subEvent.getEntity() instanceof Golem || subEvent.getEntity() instanceof Vehicle)
 			{
 				Claim claim = this.dataStore.getClaimAt(event.getEntity().getLocation(), false, null);
 				
