@@ -208,7 +208,7 @@ class PlayerEventHandler implements Listener
                                 PlayerData playerData = dataStore.getPlayerData(player.getName());
                                 Claim claim = dataStore.getClaimAt(itemFrame.getLocation(), false, playerData.lastClaim);
                                 if (claim != null) {
-                                        String noContainerReason = claim.allowContainers(player);
+                                        String noContainerReason = claim.allowBuild(player);
                                         if (noContainerReason != null) {
                                                 GriefPrevention.sendMessage(player, TextMode.Err, noContainerReason);
                                                 event.setCancelled(true);
