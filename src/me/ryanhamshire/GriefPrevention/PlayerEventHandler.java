@@ -163,7 +163,7 @@ class PlayerEventHandler implements Listener
 		Entity entity = event.getRightClicked();
 		
 		//if the entity is a vehicle and we're preventing theft in claims		
-		if(GriefPrevention.instance.config_claims_preventTheft)
+		if(GriefPrevention.instance.config_claims_preventTheft && entity instanceof Vehicle)
 		{
 			//if the entity is in a claim
                         PlayerData data = this.dataStore.getPlayerData(player.getName());
@@ -201,17 +201,8 @@ class PlayerEventHandler implements Listener
 						event.setCancelled(true);
 					}
 				}
-                                //if the entity is a villager, apply container rules
-                                else if (entity instanceof Villager) {
-                                        if (claim.allowContainers(player) != null) {
-                                                GriefPrevention.sendMessage(player, TextMode.Err, "This villager belongs to " + claim.getOwnerName() + ".");
-                                                event.setCancelled(true);
-                                        }
-                                }
 			}
-		}
-
-                if (entity instanceof ItemFrame) {
+		} else if (entity instanceof ItemFrame) {
                         ItemFrame itemFrame = (ItemFrame)entity;
                         if (itemFrame.getItem().getType() != Material.AIR) {
                                 PlayerData playerData = dataStore.getPlayerData(player.getName());
@@ -223,6 +214,13 @@ class PlayerEventHandler implements Listener
                                                 event.setCancelled(true);
                                         }
                                 }
+                        }
+                } else if (entity instanceof Villager) { // if the entity is a villager, apply container rules
+                        PlayerData data = this.dataStore.getPlayerData(player.getName());
+			Claim claim = this.dataStore.getClaimAt(entity.getLocation(), false, data.lastClaim);
+                        if (claim != null && claim.allowContainers(player) != null) {
+                                GriefPrevention.sendMessage(player, TextMode.Err, "This villager belongs to " + claim.getOwnerName() + ".");
+                                event.setCancelled(true);
                         }
                 }
 	}
