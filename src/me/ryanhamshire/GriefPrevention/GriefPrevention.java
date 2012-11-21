@@ -74,6 +74,7 @@ public class GriefPrevention extends JavaPlugin {
 	public int config_claims_minSize;								//minimum width and height for non-admin claims
         public boolean config_claims_firePlacementRequiresTrust; //players can only place fire (or lava) in claims with trust if set to true
         public boolean config_claims_fireCannotCrossClaimBorders; //prevent fire spread (or lava flow) from crossing claim borders
+        public boolean config_claims_lockDoors; //protect all doors by accesstrust
 	
 	public int config_claims_trappedCooldownHours;					//number of hours between uses of the /trapped command
 	
@@ -183,6 +184,7 @@ public class GriefPrevention extends JavaPlugin {
 		this.config_claims_trappedCooldownHours = config.getInt("GriefPrevention.Claims.TrappedCommandCooldownHours", 8);
                 this.config_claims_firePlacementRequiresTrust = config.getBoolean("GriefPrevention.Claims.FirePlacementRequiresTrust", true);
                 this.config_claims_fireCannotCrossClaimBorders = config.getBoolean("GriefPrevention.Claims.FireCannotCrossClaimBorders", true);
+                this.config_claims_lockDoors = config.getBoolean("GriefPrevention.Claims.LockDoors", false);
 		
 		this.config_economy_claimBlocksPurchaseCost = config.getDouble("GriefPrevention.Economy.ClaimBlocksPurchaseCost", 0);
 		this.config_economy_claimBlocksSellValue = config.getDouble("GriefPrevention.Economy.ClaimBlocksSellValue", 0);
@@ -203,6 +205,7 @@ public class GriefPrevention extends JavaPlugin {
 		config.set("GriefPrevention.Claims.TrappedCommandCooldownHours", this.config_claims_trappedCooldownHours);
                 config.set("GriefPrevention.Claims.FirePlacementRequiresTrust", config_claims_firePlacementRequiresTrust);
                 config.set("GriefPrevention.Claims.FireCannotCrossClaimBorders", config_claims_fireCannotCrossClaimBorders);
+                config.set("GriefPrevention.Claims.LockDoors", config_claims_lockDoors);
                 
 		config.set("GriefPrevention.Economy.ClaimBlocksPurchaseCost", this.config_economy_claimBlocksPurchaseCost);
 		config.set("GriefPrevention.Economy.ClaimBlocksSellValue", this.config_economy_claimBlocksSellValue);

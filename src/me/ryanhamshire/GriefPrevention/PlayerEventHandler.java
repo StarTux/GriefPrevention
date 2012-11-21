@@ -379,6 +379,19 @@ class PlayerEventHandler implements Listener
 				}
 			}			
 		}
+
+                //apply access rules for doors
+                else if (GriefPrevention.instance.config_claims_lockDoors && (clickedBlockType == Material.TRAP_DOOR || clickedBlockType == Material.WOODEN_DOOR || clickedBlockType == Material.FENCE_GATE)) {
+                        PlayerData data = this.dataStore.getPlayerData(player.getName());
+                        Claim claim = this.dataStore.getClaimAt(clickedBlock.getLocation(), false, data.lastClaim);
+                        if (claim != null) {
+                                String noAccessReason = claim.allowAccess(player);
+                                if (noAccessReason != null) {
+                                        event.setCancelled(true);
+                                        GriefPrevention.sendMessage(player, TextMode.Err, noAccessReason);
+                                }
+                        }
+                }
 		
 		//otherwise apply rules for containers and crafting blocks
 		else if (GriefPrevention.instance.config_claims_preventTheft && (action == Action.RIGHT_CLICK_BLOCK && (clickedBlock.getState() instanceof InventoryHolder || clickedBlockType == Material.BREWING_STAND || clickedBlockType == Material.JUKEBOX || clickedBlockType == Material.ANVIL || clickedBlockType ==  Material.BEACON))) {
