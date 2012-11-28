@@ -57,6 +57,8 @@ public class BlockEventHandler implements Listener
 	private DataStore dataStore;
         //cache last claim for the FromBlockToEvent to opimize lava flow processing
         private Claim lastBlockFromToEventClaim;
+        //cache for the BlockBurnEvent
+        private Claim lastBlockBurnEventClaim;
 	
 	//boring typical constructor
 	public BlockEventHandler(DataStore dataStore)
@@ -312,11 +314,33 @@ public class BlockEventHandler implements Listener
                 }
         }
 
+        /**
+         * When a block burns up it will sometimes turn into a new
+         * fire block. This event does not tell us where the fire
+         * block is that causes this block to burn. So, we
+         * manually check if there is a fire block within a 3x3x3
+         * cuboid around the burned block within the same claim or
+         * if both are not in a claim. If not, the spread must be
+         * cross claim and will be cancelled.
+         */
         @EventHandler(priority = EventPriority.LOWEST)
         public void onBlockBurn(BlockBurnEvent event) {
                 if (!GriefPrevention.instance.config_claims_fireCannotCrossClaimBorders) return;
-                if (event.getBlock().getType() == Material.TNT) return;
-                event.getBlock().setType(Material.AIR);
+                Claim claim = dataStore.getClaimAt(event.getBlock().getLocation(), true, lastBlockBurnEventClaim);
+                if (claim != null) lastBlockBurnEventClaim = claim;
+                for (int x = -1; x <= 1; ++x) {
+                        for (int y = -1; y <= 1; ++y) {
+                                for (int z = -1; z <= 1; ++z) {
+                                        Block source = event.getBlock().getRelative(x, y, z);
+                                        if (source.getType() != Material.FIRE) continue;
+                                        if (claim == null) {
+                                                if (dataStore.getClaimAt(source.getLocation(), true, lastBlockBurnEventClaim) == null) return;
+                                        } else {
+                                                if (claim.contains(source.getLocation(), true, false)) return;
+                                        }
+                                }
+                        }
+                }
                 event.setCancelled(true);
         }
 	
