@@ -945,9 +945,15 @@ public class GriefPrevention extends JavaPlugin {
 			//if the player isn't in a claim or has permission to build, tell him to man up
 			if(claim == null || claim.allowBuild(player) == null)
 			{
-				GriefPrevention.sendMessage(player, TextMode.Err, "You can build here.  Save yourself.");				
+				GriefPrevention.sendMessage(player, TextMode.Err, "You can build here.  Save yourself.");
 				return true;
 			}
+
+                        if (player.getWorld().getEnvironment() == World.Environment.NETHER) {
+				GriefPrevention.sendMessage(player, TextMode.Err, "The trapped command does not work in the nether.");
+				GriefPrevention.sendMessage(player, TextMode.Err, "Contact " + claim.getOwnerName() + " or a staff member if you need help.");
+				return true;
+                        }
 			
 			//check cooldown
 			long lastTrappedUsage = playerData.lastTrappedUsage.getTime();
