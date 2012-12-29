@@ -40,8 +40,6 @@ import org.bukkit.event.block.BlockDamageEvent;
 import org.bukkit.event.block.BlockFromToEvent;
 import org.bukkit.event.block.BlockIgniteEvent.IgniteCause;
 import org.bukkit.event.block.BlockIgniteEvent;
-import org.bukkit.event.block.BlockPistonExtendEvent;
-import org.bukkit.event.block.BlockPistonRetractEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.block.BlockSpreadEvent;
 import org.bukkit.event.block.SignChangeEvent;
@@ -197,56 +195,6 @@ public class BlockEventHandler implements Listener
 		
 	}
 	
-	//blocks "pushing" other players' blocks around (pistons)
-	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
-	public void onBlockPistonExtend (BlockPistonExtendEvent event)
-	{		
-		//who owns the piston, if anyone?
-		String pistonClaimOwnerName = "_";
-		Claim claim = this.dataStore.getClaimAt(event.getBlock().getLocation(), false, null);
-		if(claim != null) pistonClaimOwnerName = claim.getOwnerName();
-		
-		//which blocks are being pushed?
-		List<Block> blocks = event.getBlocks();
-		for(int i = 0; i < blocks.size(); i++)
-		{
-			//if ANY of the pushed blocks are owned by someone other than the piston owner, cancel the event
-			Block block = blocks.get(i);
-			claim = this.dataStore.getClaimAt(block.getLocation(), false, null);
-			if(claim != null && !claim.getOwnerName().equals(pistonClaimOwnerName))
-			{
-				event.setCancelled(true);
-				return;
-			}
-		}
-	}
-	
-	//blocks theft by pulling blocks out of a claim (again pistons)
-	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
-	public void onBlockPistonRetract (BlockPistonRetractEvent event)
-	{
-		//we only care about sticky pistons
-		if(!event.isSticky()) return;
-				
-		//who owns the moving block, if anyone?
-		String movingBlockOwnerName = "_";
-		Claim movingBlockClaim = this.dataStore.getClaimAt(event.getRetractLocation(), false, null);
-		if(movingBlockClaim != null) movingBlockOwnerName = movingBlockClaim.getOwnerName();
-		
-		//who owns the piston, if anyone?
-		String pistonOwnerName = "_";
-		Location pistonLocation = event.getBlock().getLocation();		
-		Claim pistonClaim = this.dataStore.getClaimAt(pistonLocation, false, null);
-		if(pistonClaim != null) pistonOwnerName = pistonClaim.getOwnerName();
-		
-		//if there are owners for the blocks, they must be the same player
-		//otherwise cancel the event
-		if(!pistonOwnerName.equals(movingBlockOwnerName))
-		{
-			event.setCancelled(true);
-		}		
-	}
-
         /**
          * Check whether a given location could be the ignition
          * point of a nether portal.  This is needed to
