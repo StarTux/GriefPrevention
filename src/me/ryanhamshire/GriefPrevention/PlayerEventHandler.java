@@ -50,6 +50,7 @@ import org.bukkit.event.player.PlayerLoginEvent.Result;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.scheduler.BukkitRunnable;
 
 class PlayerEventHandler implements Listener 
 {
@@ -67,13 +68,17 @@ class PlayerEventHandler implements Listener
 	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
 	void onPlayerChat (AsyncPlayerChatEvent event)
 	{		
-		Player player = event.getPlayer();
+		final Player player = event.getPlayer();
 		String message = event.getMessage();
 		//FEATURE: automatically educate players about the /trapped command
 		//check for "trapped" or "stuck" to educate players about the /trapped command
 		if(message.contains("trapped") || message.contains("stuck"))
 		{
-			GriefPrevention.sendMessage(player, TextMode.Info, "Are you trapped in someone's claim?  Consider the /trapped command.");
+                        new BukkitRunnable() {
+                                public void run() {
+                                        GriefPrevention.sendMessage(player, TextMode.Info, "Are you trapped in someone's claim?  Consider the /trapped command.");
+                                }
+                        }.runTask(GriefPrevention.instance);
 		}
 	}
 	
