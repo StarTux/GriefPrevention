@@ -260,6 +260,24 @@ public class BlockEventHandler implements Listener
                                 }
                         }
                 }
+                // Deny lava ignition across claims
+                if (event.getCause() == IgniteCause.LAVA) {
+                        boolean hasSource = false;
+                        Claim destClaim = dataStore.getClaimAt(event.getBlock().getLocation(), true, null);
+                mainLoop: for (int x = -1; x <= 1; ++x) {
+                                for (int y = -5; y <= 1; ++y) {
+                                        for (int z = -1; z <= 1; ++z) {
+                                                Block srcBlock = event.getBlock().getRelative(x, y, z);
+                                                if (srcBlock.getType() != Material.LAVA && srcBlock.getType() != Material.STATIONARY_LAVA) continue;
+                                                if (destClaim == null && dataStore.getClaimAt(srcBlock.getLocation(), true, null) != null) continue;
+                                                if (destClaim != null && !destClaim.contains(srcBlock.getLocation(), true, false)) continue;
+                                                hasSource = true;
+                                                break mainLoop;
+                                        }
+                                }
+                        }
+                        if (!hasSource) event.setCancelled(true);
+                }
         }
 
         /**
