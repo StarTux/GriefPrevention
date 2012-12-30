@@ -435,51 +435,29 @@ public class GriefPrevention extends JavaPlugin {
 			ArrayList<String> managers = new ArrayList<String>();
 			claim.getPermissions(builders, containers, accessors, managers);
 			
-			player.sendMessage("Explicit permissions here:");
-			
-			StringBuilder permissions = new StringBuilder();
-			permissions.append(ChatColor.GOLD + "M: ");
-			
-			if(managers.size() > 0)
-			{
-				for(int i = 0; i < managers.size(); i++)
-					permissions.append(managers.get(i) + " ");
-			}
-			
-			player.sendMessage(permissions.toString());
+                        player.sendMessage(ChatColor.DARK_AQUA + "Owned by " + ChatColor.AQUA + claim.getOwnerName() + ChatColor.DARK_AQUA + ". Trusted are:");
+                        StringBuilder permissions;
+
 			permissions = new StringBuilder();
-			permissions.append(ChatColor.YELLOW + "B: ");
-			
-			if(builders.size() > 0)
-			{				
-				for(int i = 0; i < builders.size(); i++)
-					permissions.append(builders.get(i) + " ");		
-			}
-			
+			permissions.append(ChatColor.AQUA).append("Build").append(ChatColor.DARK_AQUA).append(": ");
+                        for(int i = 0; i < builders.size(); i++) permissions.append(builders.get(i) + " ");
 			player.sendMessage(permissions.toString());
+
 			permissions = new StringBuilder();
-			permissions.append(ChatColor.GREEN + "C: ");				
-			
-			if(containers.size() > 0)
-			{
-				for(int i = 0; i < containers.size(); i++)
-					permissions.append(containers.get(i) + " ");		
-			}
-			
+			permissions.append(ChatColor.AQUA).append("Containers").append(ChatColor.DARK_AQUA).append(": ");
+                        for(int i = 0; i < containers.size(); i++) permissions.append(containers.get(i) + " ");
 			player.sendMessage(permissions.toString());
+
 			permissions = new StringBuilder();
-			permissions.append(ChatColor.BLUE + "A :");
-				
-			if(accessors.size() > 0)
-			{
-				for(int i = 0; i < accessors.size(); i++)
-					permissions.append(accessors.get(i) + " ");			
-			}
-			
+			permissions.append(ChatColor.AQUA).append("Access").append(ChatColor.DARK_AQUA).append(": ");
+                        for(int i = 0; i < accessors.size(); i++) permissions.append(accessors.get(i) + " ");
 			player.sendMessage(permissions.toString());
-			
-			player.sendMessage("(M-anager, B-builder, C-ontainers, A-ccess)");
-			
+
+			permissions = new StringBuilder();
+			permissions.append(ChatColor.AQUA).append("Permission").append(ChatColor.DARK_AQUA).append(": ");
+                        for(int i = 0; i < managers.size(); i++) permissions.append(managers.get(i) + " ");
+			player.sendMessage(permissions.toString());
+
 			return true;
 		}
 		
