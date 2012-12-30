@@ -261,7 +261,7 @@ public class BlockEventHandler implements Listener
                         }
                 }
                 // Deny lava ignition across claims
-                if (event.getCause() == IgniteCause.LAVA) {
+                if (GriefPrevention.instance.config_claims_fireCannotCrossClaimBorders && event.getCause() == IgniteCause.LAVA) {
                         boolean hasSource = false;
                         Claim destClaim = dataStore.getClaimAt(event.getBlock().getLocation(), true, null);
                 mainLoop: for (int x = -1; x <= 1; ++x) {
