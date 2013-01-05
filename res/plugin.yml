@@ -70,6 +70,7 @@ commands:
    trapped:
       description: Ejects you to nearby unclaimed land.  Usable once per 8 hours.
       usage: /Trapped
+      permission: griefprevention.trapped
       aliases: [ stuck ]
    trustlist:
       description: Lists permissions for the claim you're standing in.
@@ -98,8 +99,6 @@ permissions:
             griefprevention.adminclaims: true
             griefprevention.adjustclaimblocks: true
             griefprevention.deleteclaims: true
-            griefprevention.spam: true
-            griefprevention.lava: true
             griefprevention.eavesdrop: true
     griefprevention.ignoreclaims:
         description: Grants permission to use /IgnoreClaims.
@@ -113,12 +112,6 @@ permissions:
     griefprevention.adjustclaimblocks:
         description: Grants permission to add or remove bonus blocks from a player's account.
         default: op
-    griefprevention.spam:
-        description: Grants permission to log in, send messages, and send commands rapidly.
-        default: op
-    griefprevention.lava:
-        description: Grants permission to place lava near the surface and outside of claims.
-        default: op
-    griefprevention.eavesdrop:
-        description: Allows a player to see whispered chat messages (/tell).
+    griefprevention.trapped:
+        description: Use the /trapped command
         default: op
