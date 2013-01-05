@@ -19,9 +19,11 @@
 package me.ryanhamshire.GriefPrevention;
 
 import java.util.Calendar;
-
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 //tries to rescue a trapped player from a claim where he doesn't have permission to save himself
 //related to the /trapped slash command
@@ -53,15 +55,18 @@ class PlayerRescueTask implements Runnable
 		//if the player moved three or more blocks from where he used /trapped, admonish him and don't save him
 		if(player.getLocation().distance(this.location) > 3)
 		{
-			GriefPrevention.sendMessage(player, TextMode.Err, "You moved!  Rescue cancelled.");
+			GriefPrevention.sendMessage(player, TextMode.Err, "You moved! Rescue cancelled.");
 			return;
 		}
 		
-		//otherwise find a place to teleport him
-		Location destination = GriefPrevention.instance.ejectPlayer(this.player);
-		
 		//log entry, in case admins want to investigate the "trap"
-		GriefPrevention.addLogEntry("Rescued trapped player " + player.getName() + " from " + GriefPrevention.getfriendlyLocationString(this.location) + " to " + GriefPrevention.getfriendlyLocationString(destination) + ".");
+		GriefPrevention.addLogEntry("Helped trapped player " + player.getName() + " at " + GriefPrevention.getfriendlyLocationString(this.location));
+
+                if (!player.getInventory().addItem(new ItemStack(Material.ENDER_PEARL)).isEmpty()) {
+                        player.getWorld().dropItem(player.getLocation(), new ItemStack(Material.ENDER_PEARL));
+                }
+                GriefPrevention.sendMessage(player, ChatColor.DARK_AQUA, "It's dangerous to go alone. Take this.");
+                GriefPrevention.sendMessage(player, ChatColor.DARK_AQUA, "You got the " + ChatColor.AQUA + "Ender Pearl" + ChatColor.DARK_AQUA + ".");
 		
 		//timestamp this successful save so that he can't use /trapped again for a while		
 		playerData.lastTrappedUsage = Calendar.getInstance().getTime();		

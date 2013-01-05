@@ -923,16 +923,16 @@ public class GriefPrevention extends JavaPlugin {
 			//if the player isn't in a claim or has permission to build, tell him to man up
 			if(claim == null || claim.allowBuild(player) == null)
 			{
-				GriefPrevention.sendMessage(player, TextMode.Err, "You can build here.  Save yourself.");
+				GriefPrevention.sendMessage(player, TextMode.Err, "You can build here. Save yourself.");
 				return true;
 			}
 
-                        if (player.getWorld().getEnvironment() == World.Environment.NETHER) {
-				GriefPrevention.sendMessage(player, TextMode.Err, "The trapped command does not work in the nether.");
-				GriefPrevention.sendMessage(player, TextMode.Err, "Contact " + claim.getOwnerName() + " or a staff member if you need help.");
+                        // if the player has ender pearls, he should be able to help himself
+                        if (player.getInventory().contains(Material.ENDER_PEARL)) {
+				GriefPrevention.sendMessage(player, TextMode.Err, "You have ender pearls. Use them to save yourself.");
 				return true;
                         }
-			
+
 			//check cooldown
 			long lastTrappedUsage = playerData.lastTrappedUsage.getTime();
 			long nextTrappedUsage = lastTrappedUsage + 1000 * 60 * 60 * this.config_claims_trappedCooldownHours; 
@@ -944,7 +944,7 @@ public class GriefPrevention extends JavaPlugin {
 			}
 			
 			//send instructions
-			GriefPrevention.sendMessage(player, TextMode.Instr, "If you stay put for 10 seconds, you'll be teleported out.  Please wait.");
+			GriefPrevention.sendMessage(player, ChatColor.AQUA, "Help is on the way. Stay put for 10 seconds.");
 			
 			//create a task to rescue this player in a little while
 			PlayerRescueTask task = new PlayerRescueTask(player, player.getLocation());
