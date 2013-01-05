@@ -183,7 +183,7 @@ public class BlockEventHandler implements Listener
 			//check to see if this chest is in a claim, and warn when it isn't
 			if(GriefPrevention.instance.config_claims_preventTheft && this.dataStore.getClaimAt(block.getLocation(), false, playerData.lastClaim) == null)
 			{
-				GriefPrevention.sendMessage(player, TextMode.Warn, "This chest is NOT protected.  Consider expanding an existing claim or creating a new one.");				
+				GriefPrevention.sendMessage(player, ChatColor.DARK_AQUA, "This chest is not protected. Consider expanding an existing claim or creating a new one.");				
 			}
                 }
                 // else if (block.getType() == Material.TNT && !playerData.ignoreClaims) {
