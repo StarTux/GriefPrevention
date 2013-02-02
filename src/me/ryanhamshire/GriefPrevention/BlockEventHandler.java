@@ -66,7 +66,7 @@ public class BlockEventHandler implements Listener
 	}
 	
 	//when a player breaks a block...
-	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
+	@EventHandler(ignoreCancelled = true, priority = EventPriority.HIGH)
 	public void onBlockBreak(BlockBreakEvent breakEvent)
 	{
 		Player player = breakEvent.getPlayer();
@@ -97,7 +97,7 @@ public class BlockEventHandler implements Listener
 	}
 	
 	//when a player places a block...
-	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
+	@EventHandler(ignoreCancelled = true, priority = EventPriority.HIGH)
 	public void onBlockPlace(BlockPlaceEvent placeEvent)
 	{
 		Player player = placeEvent.getPlayer();
@@ -233,7 +233,7 @@ public class BlockEventHandler implements Listener
                 return false;
         }
 	
-	@EventHandler(priority = EventPriority.LOWEST)
+	@EventHandler(priority = EventPriority.HIGH)
 	public void onBlockIgnite (BlockIgniteEvent event)
 	{
                 // Deny usage of flint and steel or fireballs without build permission
@@ -290,7 +290,7 @@ public class BlockEventHandler implements Listener
          * if both are not in a claim. If not, the spread must be
          * cross claim and will be cancelled.
          */
-        @EventHandler(priority = EventPriority.LOWEST)
+        @EventHandler(priority = EventPriority.HIGH)
         public void onBlockBurn(BlockBurnEvent event) {
                 if (!GriefPrevention.instance.config_claims_fireCannotCrossClaimBorders) return;
                 Claim claim = dataStore.getClaimAt(event.getBlock().getLocation(), true, lastBlockBurnEventClaim);
@@ -311,7 +311,7 @@ public class BlockEventHandler implements Listener
                 event.setCancelled(true);
         }
 	
-	@EventHandler(priority = EventPriority.LOWEST)
+	@EventHandler(priority = EventPriority.HIGH)
 	public void onBlockSpread(BlockSpreadEvent event)
 	{
                 if (!GriefPrevention.instance.config_claims_fireCannotCrossClaimBorders) return;
@@ -335,7 +335,7 @@ public class BlockEventHandler implements Listener
         }
 	
 	//ensures fluids don't flow out of claims, unless into another claim where the owner is trusted to build
-	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
+	@EventHandler(ignoreCancelled = true, priority = EventPriority.HIGH)
 	public void onBlockFromTo (BlockFromToEvent spreadEvent)
 	{
                 if (!GriefPrevention.instance.config_claims_fireCannotCrossClaimBorders) return;

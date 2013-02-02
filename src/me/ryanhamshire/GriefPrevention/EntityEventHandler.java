@@ -68,7 +68,7 @@ class EntityEventHandler implements Listener
 	}
 	
 	//when an entity picks up an item
-	@EventHandler(priority = EventPriority.LOWEST)
+	@EventHandler(priority = EventPriority.HIGH)
 	public void onEntityPickup(EntityChangeBlockEvent event)
 	{
 		//FEATURE: endermen don't steal claimed blocks
@@ -86,7 +86,7 @@ class EntityEventHandler implements Listener
 	}
 	
 	//when a Hanging is broken
-	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
+	@EventHandler(ignoreCancelled = true, priority = EventPriority.HIGH)
 	public void onHangingBreak(HangingBreakEvent event)
         {
                 //FEATURE: claimed Hangings are protected from breakage
@@ -144,7 +144,7 @@ class EntityEventHandler implements Listener
         }
 	
 	//when a Hanging is placed...
-	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
+	@EventHandler(ignoreCancelled = true, priority = EventPriority.HIGH)
 	public void onHangingPlace(HangingPlaceEvent event)
 	{
 		//FEATURE: similar to above, placing a Hanging requires build permission in the claim
@@ -159,7 +159,7 @@ class EntityEventHandler implements Listener
 	}
 	
 	//when an entity is damaged
-	@EventHandler(ignoreCancelled = true, priority = EventPriority.LOWEST)
+	@EventHandler(ignoreCancelled = true, priority = EventPriority.HIGH)
 	public void onEntityDamage (EntityDamageEvent event)
 	{
 		//only actually interested in entities damaging entities (ignoring environmental damage)
