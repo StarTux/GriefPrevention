@@ -209,18 +209,17 @@ public class DataStore
 			sevenDaysAgo.add(Calendar.DATE, -7);
 			boolean claimsExpired = sevenDaysAgo.getTime().after(playerData.lastLogin);
 			
-			//if only one claim, and the player hasn't played in a week
-			if(claimsExpired && playerData.claims.size() == 1)
-			{
-				Claim claim = playerData.claims.get(0);
-				
-				//if that's a chest claim, delete it
-				if(claim.getArea() <= areaOfDefaultClaim)
-				{
-					this.deleteClaim(claim);
-					GriefPrevention.addLogEntry(" " + playerName + "'s new player claim expired.");
-				}
-			}
+			// //if only one claim, and the player hasn't played in a week
+			// if(claimsExpired && playerData.claims.size() == 1)
+			// {
+			// 	Claim claim = playerData.claims.get(0);
+			// 	//if that's a chest claim, delete it
+			// 	if(claim.getArea() <= areaOfDefaultClaim)
+			// 	{
+			// 		this.deleteClaim(claim);
+			// 		GriefPrevention.addLogEntry(" " + playerName + "'s new player claim expired.");
+			// 	}
+			// }
 			
 			if(GriefPrevention.instance.config_claims_expirationDays > 0)
 			{
