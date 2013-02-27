@@ -405,9 +405,10 @@ public class Claim
                         World.Environment env = location.getWorld().getEnvironment();
                         if (env == World.Environment.NORMAL) {
                                 if (location.getBlockY() < GriefPrevention.instance.config_claims_maxDepth) return false;
+                                if (y < this.lesserBoundaryCorner.getBlockY()) return false;
                         }
                         if (env == World.Environment.NETHER) {
-                                if (location.getBlockY() >= 128 - GriefPrevention.instance.config_claims_maxDepth) return false;
+                                if (location.getBlockY() >= 128 - 16) return false;
                         }
                 }
 		boolean inClaim = //(ignoreHeight || y >= this.lesserBoundaryCorner.getBlockY()) &&
