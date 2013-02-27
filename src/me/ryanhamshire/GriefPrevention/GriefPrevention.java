@@ -281,6 +281,17 @@ public class GriefPrevention extends JavaPlugin {
 		{
 			player = (Player) sender;
 		}
+
+                //claims
+                if (cmd.getName().equalsIgnoreCase("claims")) {
+                        Claim claim = dataStore.getClaimAt(player.getLocation(), true, null);
+                        if (claim == null) {
+                                player.sendMessage("" + ChatColor.RED + "You must stand inside a claim.");
+                                return true;
+                        }
+                        player.sendMessage("Depth: " + claim.lesserBoundaryCorner.getBlockY());
+                        return true;
+                }
 		
 		//abandonclaim
 		if(cmd.getName().equalsIgnoreCase("abandonclaim") && player != null)
