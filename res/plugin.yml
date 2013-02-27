@@ -105,7 +105,7 @@ permissions:
       griefprevention.adminclaims: true
       griefprevention.adjustclaimblocks: true
       griefprevention.deleteclaims: true
-      griefprevention.eavesdrop: true
+      griefprevention.dangerousitems: true
   griefprevention.ignoreclaims:
     description: Grants permission to use /IgnoreClaims.
     default: op
@@ -120,4 +120,7 @@ permissions:
     default: op
   griefprevention.trapped:
     description: Use the /trapped command
+    default: op
+  griefprevention.dangerousitems:
+    description: Use lava buckets and fire outside of claims
     default: op

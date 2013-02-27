@@ -243,7 +243,7 @@ public class BlockEventHandler implements Listener
                                 PlayerData playerData = GriefPrevention.instance.dataStore.getPlayerData(player.getName());
                                 Claim claim = dataStore.getClaimAt(event.getBlock().getLocation(), true, playerData.lastClaim);
                                 // Deny ignition if it player has no build permissions unless it is for a nether portal
-                                if (GriefPrevention.instance.config_claims_firePlacementRequiresTrust && claim == null && !playerData.ignoreClaims) {
+                                if (GriefPrevention.instance.config_claims_firePlacementRequiresTrust && claim == null && !playerData.ignoreClaims && !player.hasPermission("griefprevention.dangerousitems")) {
                                         if (!checkNetherPortal(event.getBlock().getLocation())) {
                                                 GriefPrevention.sendMessage(player, TextMode.Err, "You cannot do that outside your own claims.");
                                                 event.setCancelled(true);

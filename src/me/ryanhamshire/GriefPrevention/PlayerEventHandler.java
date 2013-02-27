@@ -285,9 +285,9 @@ class PlayerEventHandler implements Listener
 
                 if (GriefPrevention.instance.config_claims_firePlacementRequiresTrust) {
                         // deny placement of lava outside a claim with build permissions
-                        Claim claim = dataStore.getClaimAt(block.getLocation(), true, null);
                         PlayerData playerData = dataStore.getPlayerData(player.getName());
-                        if (bucketEvent.getBucket() == Material.LAVA_BUCKET && claim == null && !playerData.ignoreClaims) {
+                        Claim claim = dataStore.getClaimAt(block.getLocation(), true, playerData.lastClaim);
+                        if (bucketEvent.getBucket() == Material.LAVA_BUCKET && claim == null && !playerData.ignoreClaims && !player.hasPermission("griefprevention.dangerousitems")) {
                                 // The absence of a claim is enough because we already
                                 // know that the player has build perms
                                 GriefPrevention.sendMessage(player, TextMode.Err, "You cannot place that outside your own claim.");
