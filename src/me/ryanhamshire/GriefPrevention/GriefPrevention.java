@@ -78,13 +78,13 @@ public class GriefPrevention extends JavaPlugin {
 	
 	public int config_claims_trappedCooldownHours;					//number of hours between uses of the /trapped command
 	
-	public double config_economy_claimBlocksPurchaseCost;			//cost to purchase a claim block.  set to zero to disable purchase.
+        public double config_economy_claimBlocksPurchaseCost;			//cost to purchase a claim block.  set to zero to disable purchase.
 	public double config_economy_claimBlocksSellValue;				//return on a sold claim block.  set to zero to disable sale.
 	
 	//reference to the economy plugin, if economy integration is enabled
 	public static Economy economy = null;					
 	
-	//how long to wait before deciding a player is staying online or staying offline, for notication messages
+        //how long to wait before deciding a player is staying online or staying offline, for notication messages
 	public static final int NOTIFICATION_SECONDS = 20;
 	
 	//adds a server log entry
@@ -861,7 +861,36 @@ public class GriefPrevention extends JavaPlugin {
 			return true;
 		}
 		
-		//deletealladminclaims
+		//resetclaims <player>
+		else if(cmd.getName().equalsIgnoreCase("resetclaims") && player != null)
+		{
+			//requires exactly one parameter, the other player's name
+			if(args.length != 1) return false;
+			
+			//try to find that player
+			OfflinePlayer otherPlayer = this.resolvePlayer(args[0]);
+			if(otherPlayer == null)
+			{
+				GriefPrevention.sendMessage(player, TextMode.Err, "Player not found.");
+				return true;
+			}
+			
+			//delete all that player's claims
+			this.dataStore.deleteClaimsForPlayer(otherPlayer.getName(), true);
+                        //set claim blocks bank to zero
+			PlayerData playerData = this.dataStore.getPlayerData(otherPlayer.getName());
+			playerData.accruedClaimBlocks = GriefPrevention.instance.config_claims_initialBlocks;                        
+                        this.dataStore.savePlayerData(otherPlayer.getName(), playerData);
+
+			GriefPrevention.sendMessage(player, TextMode.Success, "Deleted " + otherPlayer.getName() + "'s claims and set their block bank to the initial value.");
+			
+			//revert any current visualization
+			Visualization.Revert(player);
+			
+			return true;
+		}
+
+                //deletealladminclaims
 		else if(cmd.getName().equalsIgnoreCase("deletealladminclaims") && player != null)
 		{
 			if(!player.hasPermission("griefprevention.deleteclaims"))
@@ -917,7 +946,43 @@ public class GriefPrevention extends JavaPlugin {
 			return true;			
 		}
 		
-		//trapped
+		//setblockbank <player> <amount>
+		else if(cmd.getName().equalsIgnoreCase("setblockbank"))
+		{
+			//requires exactly two parameters, the other player's name and the adjustment
+			if(args.length != 2) return false;
+			
+			//find the specified player
+			OfflinePlayer targetPlayer = this.resolvePlayer(args[0]);
+			if(targetPlayer == null)
+			{
+				GriefPrevention.sendMessage(sender, TextMode.Err, "Player \"" + args[0] + "\" not found.");
+				return true;
+			}
+			
+			//parse the adjustment amount
+			int adjustment;			
+			try
+			{
+				adjustment = Integer.parseInt(args[1]);
+			}
+			catch(NumberFormatException numberFormatException)
+			{
+				return false;  //causes usage to be displayed
+			}
+			
+			//give blocks to player
+			PlayerData playerData = this.dataStore.getPlayerData(targetPlayer.getName());
+			playerData.accruedClaimBlocks = GriefPrevention.instance.config_claims_initialBlocks;
+                        this.dataStore.savePlayerData(targetPlayer.getName(), playerData);
+			
+			GriefPrevention.sendMessage(sender, TextMode.Success, "Adjusted " + targetPlayer.getName() + "'s bonus claim blocks by " + adjustment + ".  New total bonus blocks: " + playerData.bonusClaimBlocks + ".");
+			GriefPrevention.addLogEntry(sender.getName() + " adjusted " + targetPlayer.getName() + "'s bonus claim blocks by " + adjustment + ".");
+			
+			return true;			
+		}
+
+                //trapped
 		else if(cmd.getName().equalsIgnoreCase("trapped") && player != null)
 		{
 			//FEATURE: empower players who get "stuck" in an area where they don't have permission to build to save themselves
