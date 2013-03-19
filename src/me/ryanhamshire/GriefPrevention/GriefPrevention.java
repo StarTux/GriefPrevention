@@ -21,6 +21,7 @@ package me.ryanhamshire.GriefPrevention;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -86,6 +87,7 @@ public class GriefPrevention extends JavaPlugin {
 	
 	//how long to wait before deciding a player is staying online or staying offline, for notication messages
 	public static final int NOTIFICATION_SECONDS = 20;
+        public List<String> superusers = Arrays.asList("[RedPower]", "[ComputerCraft]");
 	
 	//adds a server log entry
 	public static void addLogEntry(String entry)

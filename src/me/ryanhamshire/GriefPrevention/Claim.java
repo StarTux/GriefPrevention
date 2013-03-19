@@ -170,6 +170,7 @@ public class Claim
 	{
 		//if we don't know who's asking, always say no (i've been told some mods can make this happen somehow)
 		if(player == null) return "";
+                if (GriefPrevention.instance.superusers.contains(player.getName())) return null;
 		
 		//special cases...
 		
@@ -204,6 +205,7 @@ public class Claim
 	{
 		//if we don't know who's asking, always say no (i've been told some mods can make this happen somehow)
 		if(player == null) return "";
+                if (GriefPrevention.instance.superusers.contains(player.getName())) return null;
 		
 		//admin claims can always be modified by admins, no exceptions
 		if(this.isAdminClaim())
@@ -235,6 +237,7 @@ public class Claim
 	{
 		//if we don't know who's asking, always say no (i've been told some mods can make this happen somehow)
 		if(player == null) return "";
+                if (GriefPrevention.instance.superusers.contains(player.getName())) return null;
 		
 		//build rules apply
 		return this.allowBuild(player);		
@@ -245,6 +248,7 @@ public class Claim
 	{
 		//if we don't know who's asking, always say no (i've been told some mods can make this happen somehow)
 		if(player == null) return "";
+                if (GriefPrevention.instance.superusers.contains(player.getName())) return null;
 		
 		//everyone always has access to admin claims
 		if(this.isAdminClaim()) return null;
@@ -273,6 +277,7 @@ public class Claim
 	{		
 		//if we don't know who's asking, always say no (i've been told some mods can make this happen somehow)
 		if(player == null) return "";
+                if (GriefPrevention.instance.superusers.contains(player.getName())) return null;
 		
 		//containers are always accessible in admin claims
 		if(this.isAdminClaim()) return null;
