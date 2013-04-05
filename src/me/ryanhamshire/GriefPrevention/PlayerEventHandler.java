@@ -316,6 +316,7 @@ class PlayerEventHandler implements Listener
 
         @EventHandler(ignoreCancelled = false, priority = EventPriority.HIGH)
         void onPlayerInteractTool(PlayerInteractEvent event) {
+                if (event.getAction() != Action.RIGHT_CLICK_AIR && event.getAction() != Action.RIGHT_CLICK_BLOCK) return;
                 Player player = event.getPlayer();
                 //what's the player holding?
                 Material materialInHand = player.getItemInHand().getType();
