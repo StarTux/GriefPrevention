@@ -28,6 +28,7 @@ import org.bukkit.World.Environment;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Animals;
 import org.bukkit.entity.Arrow;
+import org.bukkit.entity.Bat;
 import org.bukkit.entity.Creature;
 import org.bukkit.entity.Creeper;
 import org.bukkit.entity.Enderman;
@@ -37,6 +38,7 @@ import org.bukkit.entity.Golem;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
+import org.bukkit.entity.Squid;
 import org.bukkit.entity.Tameable;
 import org.bukkit.entity.ThrownPotion;
 import org.bukkit.entity.Vehicle;
@@ -204,7 +206,7 @@ class EntityEventHandler implements Listener
                                 if (tameable.isTamed() && tameable.getOwner().equals(attacker)) return;
                         }
 			//if the entity is an animal, golem, villager or a vehicle
-			if (subEvent.getEntity() instanceof Animals || subEvent.getEntity() instanceof Golem || subEvent.getEntity() instanceof Villager || subEvent.getEntity() instanceof Vehicle) {
+			if (subEvent.getEntity() instanceof Animals || subEvent.getEntity() instanceof Golem || subEvent.getEntity() instanceof Villager || subEvent.getEntity() instanceof Vehicle || subEvent.getEntity() instanceof Squid || subEvent.getEntity() instanceof Bat) {
 				Claim claim = this.dataStore.getClaimAt(event.getEntity().getLocation(), false, null);
 				
 				//if it's claimed
